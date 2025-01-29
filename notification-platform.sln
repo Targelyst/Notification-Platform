@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationPlatform", "NotificationPlatform\NotificationPlatform.csproj", "{DF1B0859-3322-4FED-972F-29A91C9C9BE0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationPlatform.Tests", "NotificationPlatform.Tests\NotificationPlatform.Tests.csproj", "{82CC5FE8-1AFD-4B59-B94F-DBD1680E7934}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DF1B0859-3322-4FED-972F-29A91C9C9BE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF1B0859-3322-4FED-972F-29A91C9C9BE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF1B0859-3322-4FED-972F-29A91C9C9BE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF1B0859-3322-4FED-972F-29A91C9C9BE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82CC5FE8-1AFD-4B59-B94F-DBD1680E7934}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82CC5FE8-1AFD-4B59-B94F-DBD1680E7934}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82CC5FE8-1AFD-4B59-B94F-DBD1680E7934}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82CC5FE8-1AFD-4B59-B94F-DBD1680E7934}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
