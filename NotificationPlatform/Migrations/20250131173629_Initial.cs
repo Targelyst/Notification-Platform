@@ -12,24 +12,29 @@ namespace NotificationPlatform.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Partners",
+                name: "Projects",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    Tenant = table.Column<Guid>(type: "uuid", nullable: false)
+                    Tenant = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Partners", x => x.Id);
+                    table.PrimaryKey("PK_Projects", x => x.Id);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Projects_Tenant",
+                table: "Projects",
+                column: "Tenant");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Partners");
+                name: "Projects");
         }
     }
 }

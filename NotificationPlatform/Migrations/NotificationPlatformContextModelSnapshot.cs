@@ -22,7 +22,7 @@ namespace NotificationPlatform.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("NotificationPlatform.Models.Partner", b =>
+            modelBuilder.Entity("NotificationPlatform.Models.Project", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -32,12 +32,15 @@ namespace NotificationPlatform.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("Tenant")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Tenant")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Partners");
+                    b.HasIndex("Tenant");
+
+                    b.ToTable("Projects");
                 });
 #pragma warning restore 612, 618
         }

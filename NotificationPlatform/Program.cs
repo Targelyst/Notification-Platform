@@ -1,11 +1,20 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using NotificationPlatform.Auth;
 using NotificationPlatform.Configuration;
 using NotificationPlatform.Data;
+using NotificationPlatform.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOptions<DatabaseConfiguration>()
   .Bind(builder.Configuration.GetSection(DatabaseConfiguration.Section))
+  .ValidateDataAnnotations()
+  .ValidateOnStart();
+
+builder.Services.AddOptions<AuthConfiguration>()
+  .Bind(builder.Configuration.GetSection(AuthConfiguration.Section))
   .ValidateDataAnnotations()
   .ValidateOnStart();
 
@@ -17,11 +26,57 @@ builder.Services.AddDbContextFactory<NotificationPlatformContext>(opt => {
 });
 
 builder.Services
+    .AddHttpContextAccessor()
+    .AddScoped<IAuthorizationHandler, HasTenantHandler>();
+
+if (!builder.Environment.IsDevelopment()) {
+    builder.Services
+        .AddScoped<IUserService, UserService>()
+        .AddAuthentication()
+        .AddJwtBearer("TENANTS", options => {
+            var c = builder.Configuration.GetSection(AuthConfiguration.Section).Get<AuthConfiguration>()
+                ?? throw new Exception($"Could not get configuration section {AuthConfiguration.Section}");
+
+            options.RequireHttpsMetadata = false;
+            options.MetadataAddress = c.MetadataAddress;
+
+            options.TokenValidationParameters = new TokenValidationParameters {
+                ValidAudience = c.Audience,
+                // NameClaimType = "preferred_username",
+                // RoleClaimType = "impolar_roles"
+            };
+        });
+
+    builder.Services.AddAuthorization(opts => {
+        var tenantsAuthorizationPolicyBuilder = new AuthorizationPolicyBuilder("TENANTS")
+            .AddRequirements(new HasTenantRequirement())
+            .RequireAuthenticatedUser();
+
+        opts.DefaultPolicy = tenantsAuthorizationPolicyBuilder.Build();
+        opts.FallbackPolicy = opts.DefaultPolicy;
+    });
+} else {
+    builder.Services.AddScoped<IUserService, DevelopmentUserService>();
+}
+
+builder.Services
     .AddGraphQLServer()
+    .AddAuthorization()
+    .AddProjections()
+    .AddFiltering()
     .RegisterDbContextFactory<NotificationPlatformContext>()
-    .AddTypes();
+    .AddTypes()
+    .ModifyRequestOptions(
+        // opt => opt.IncludeExceptionDetails = builder.Environment.IsDevelopment()
+        opt => opt.IncludeExceptionDetails = true
+    );
 
 var app = builder.Build();
+
+if (!app.Environment.IsDevelopment()) {
+    app.UseAuthentication();
+    app.UseAuthorization();
+}
 
 app.MapGraphQL();
 

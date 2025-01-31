@@ -1,5 +1,5 @@
 namespace NotificationPlatform.Models;
 
-public class Partner : Entity {
+public class Project : Entity {
     public required string Name { get; set; }
 }

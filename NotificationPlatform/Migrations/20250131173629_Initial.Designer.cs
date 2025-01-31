@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NotificationPlatform.Migrations
 {
     [DbContext(typeof(NotificationPlatformContext))]
-    [Migration("20250130223346_Initial")]
+    [Migration("20250131173629_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace NotificationPlatform.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("NotificationPlatform.Models.Partner", b =>
+            modelBuilder.Entity("NotificationPlatform.Models.Project", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -35,12 +35,15 @@ namespace NotificationPlatform.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("Tenant")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Tenant")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Partners");
+                    b.HasIndex("Tenant");
+
+                    b.ToTable("Projects");
                 });
 #pragma warning restore 612, 618
         }
