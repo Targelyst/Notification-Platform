@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using NotificationPlatform.Auth;
 using NotificationPlatform.Configuration;
 using NotificationPlatform.Data;
+using NotificationPlatform.Models.Email;
 using NotificationPlatform.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +23,12 @@ builder.Services.AddDbContextFactory<NotificationPlatformContext>(opt => {
     var c = builder.Configuration.GetSection(DatabaseConfiguration.Section).Get<DatabaseConfiguration>()
       ?? throw new Exception($"Could not get configuration section {DatabaseConfiguration.Section}");
 
-    opt.UseNpgsql($"Host={c.Host};Port={c.Port};Database={c.Database};Username={c.User};Password={c.Password}");
+    opt.UseNpgsql(
+        $"Host={c.Host};Port={c.Port};Database={c.Database};Username={c.User};Password={c.Password}",
+        opt => {
+            opt.MapEnum<EmailContactPropertyType>();
+        }
+    );
 });
 
 builder.Services
@@ -66,6 +72,10 @@ builder.Services
     .AddFiltering()
     .RegisterDbContextFactory<NotificationPlatformContext>()
     .AddTypes()
+    .AddType<EmailContactStringProperty>()
+    .AddType<EmailContactNumberProperty>()
+    .AddType<EmailContactDateProperty>()
+    .AddType<EmailContactChoiceProperty>()
     .ModifyRequestOptions(
         // opt => opt.IncludeExceptionDetails = builder.Environment.IsDevelopment()
         opt => opt.IncludeExceptionDetails = true
@@ -73,7 +83,9 @@ builder.Services
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment()) {
+if (app.Environment.IsDevelopment()) {
+    app.UseSeeding();
+} else {
     app.UseAuthentication();
     app.UseAuthorization();
 }
