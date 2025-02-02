@@ -1,7 +1,9 @@
 namespace NotificationPlatform.Models.Email;
 
-public class EmailContact : Entity {
+public class EmailContact : KeyedEntity {
 
     public required string EmailAddress { get; set; }
+
+    public List<EmailContactPropertyValue> Properties { get; set; } = [];
 
 }

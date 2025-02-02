@@ -48,8 +48,6 @@ if (!builder.Environment.IsDevelopment()) {
 
             options.TokenValidationParameters = new TokenValidationParameters {
                 ValidAudience = c.Audience,
-                // NameClaimType = "preferred_username",
-                // RoleClaimType = "impolar_roles"
             };
         });
 
@@ -76,9 +74,12 @@ builder.Services
     .AddType<EmailContactNumberProperty>()
     .AddType<EmailContactDateProperty>()
     .AddType<EmailContactChoiceProperty>()
+    .AddType<EmailContactStringPropertyValue>()
+    .AddType<EmailContactNumberPropertyValue>()
+    .AddType<EmailContactDatePropertyValue>()
+    .AddType<EmailContactChoicePropertyValue>()
     .ModifyRequestOptions(
-        // opt => opt.IncludeExceptionDetails = builder.Environment.IsDevelopment()
-        opt => opt.IncludeExceptionDetails = true
+        opt => opt.IncludeExceptionDetails = builder.Environment.IsDevelopment()
     );
 
 var app = builder.Build();

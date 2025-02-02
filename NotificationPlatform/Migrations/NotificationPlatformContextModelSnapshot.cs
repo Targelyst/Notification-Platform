@@ -58,9 +58,6 @@ namespace NotificationPlatform.Migrations
                     b.Property<Guid?>("EmailConfigurationId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("EmailContactPropertyId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Tenant")
                         .IsRequired()
                         .HasColumnType("text");
@@ -68,8 +65,6 @@ namespace NotificationPlatform.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("EmailConfigurationId");
-
-                    b.HasIndex("EmailContactPropertyId");
 
                     b.ToTable("EmailContacts");
                 });
@@ -87,6 +82,9 @@ namespace NotificationPlatform.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("Show")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Tenant")
                         .IsRequired()
                         .HasColumnType("text");
@@ -102,6 +100,32 @@ namespace NotificationPlatform.Migrations
                         .IsUnique();
 
                     b.ToTable("EmailContactProperties");
+
+                    b.HasDiscriminator<EmailContactPropertyType>("Type");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactPropertyValue", b =>
+                {
+                    b.Property<Guid>("ContactId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PropertyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Tenant")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<EmailContactPropertyType>("Type")
+                        .HasColumnType("email_contact_property_type");
+
+                    b.HasKey("ContactId", "PropertyId");
+
+                    b.HasIndex("PropertyId");
+
+                    b.ToTable("EmailContactPropertyValues");
 
                     b.HasDiscriminator<EmailContactPropertyType>("Type");
 
@@ -159,6 +183,66 @@ namespace NotificationPlatform.Migrations
                     b.HasDiscriminator().HasValue(EmailContactPropertyType.String);
                 });
 
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactChoicePropertyValue", b =>
+                {
+                    b.HasBaseType("NotificationPlatform.Models.Email.EmailContactPropertyValue");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.ToTable("EmailContactPropertyValues", t =>
+                        {
+                            t.Property("Value")
+                                .HasColumnName("EmailContactChoicePropertyValue_Value");
+                        });
+
+                    b.HasDiscriminator().HasValue(EmailContactPropertyType.Choice);
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactDatePropertyValue", b =>
+                {
+                    b.HasBaseType("NotificationPlatform.Models.Email.EmailContactPropertyValue");
+
+                    b.Property<DateOnly>("Value")
+                        .HasColumnType("date");
+
+                    b.ToTable("EmailContactPropertyValues", t =>
+                        {
+                            t.Property("Value")
+                                .HasColumnName("EmailContactDatePropertyValue_Value");
+                        });
+
+                    b.HasDiscriminator().HasValue(EmailContactPropertyType.Date);
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactNumberPropertyValue", b =>
+                {
+                    b.HasBaseType("NotificationPlatform.Models.Email.EmailContactPropertyValue");
+
+                    b.Property<double>("Value")
+                        .HasColumnType("double precision");
+
+                    b.HasDiscriminator().HasValue(EmailContactPropertyType.Number);
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactStringPropertyValue", b =>
+                {
+                    b.HasBaseType("NotificationPlatform.Models.Email.EmailContactPropertyValue");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.ToTable("EmailContactPropertyValues", t =>
+                        {
+                            t.Property("Value")
+                                .HasColumnName("EmailContactStringPropertyValue_Value");
+                        });
+
+                    b.HasDiscriminator().HasValue(EmailContactPropertyType.String);
+                });
+
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailConfiguration", b =>
                 {
                     b.HasOne("NotificationPlatform.Models.Project", "Project")
@@ -173,18 +257,14 @@ namespace NotificationPlatform.Migrations
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContact", b =>
                 {
                     b.HasOne("NotificationPlatform.Models.Email.EmailConfiguration", null)
-                        .WithMany("EmailContacts")
+                        .WithMany("Contacts")
                         .HasForeignKey("EmailConfigurationId");
-
-                    b.HasOne("NotificationPlatform.Models.Email.EmailContactProperty", null)
-                        .WithMany("EmailContacts")
-                        .HasForeignKey("EmailContactPropertyId");
                 });
 
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactProperty", b =>
                 {
                     b.HasOne("NotificationPlatform.Models.Email.EmailConfiguration", "EmailConfiguration")
-                        .WithMany("EmailContactProperties")
+                        .WithMany("Properties")
                         .HasForeignKey("EmailConfigurationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -192,16 +272,40 @@ namespace NotificationPlatform.Migrations
                     b.Navigation("EmailConfiguration");
                 });
 
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactPropertyValue", b =>
+                {
+                    b.HasOne("NotificationPlatform.Models.Email.EmailContact", "Contact")
+                        .WithMany("Properties")
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NotificationPlatform.Models.Email.EmailContactProperty", "Property")
+                        .WithMany("Values")
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contact");
+
+                    b.Navigation("Property");
+                });
+
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailConfiguration", b =>
                 {
-                    b.Navigation("EmailContactProperties");
+                    b.Navigation("Contacts");
 
-                    b.Navigation("EmailContacts");
+                    b.Navigation("Properties");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContact", b =>
+                {
+                    b.Navigation("Properties");
                 });
 
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactProperty", b =>
                 {
-                    b.Navigation("EmailContacts");
+                    b.Navigation("Values");
                 });
 
             modelBuilder.Entity("NotificationPlatform.Models.Project", b =>

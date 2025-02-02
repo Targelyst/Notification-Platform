@@ -11,15 +11,16 @@ public enum EmailContactPropertyType {
 
 [InterfaceType]
 [Index(nameof(Type), nameof(Name), IsUnique = true)]
-public abstract class EmailContactProperty : Entity {
+public abstract class EmailContactProperty : KeyedEntity {
 
     public EmailContactPropertyType Type { get; set; }
     public required string Name { get; set; }
+    public bool Show { get; set; } = true;
 
     public Guid EmailConfigurationId { get; set; }
     public EmailConfiguration EmailConfiguration { get; set; } = null!;
 
-    public List<EmailContact> EmailContacts { get; set; } = [];
+    public List<EmailContactPropertyValue> Values { get; set; } = [];
 
 }
 

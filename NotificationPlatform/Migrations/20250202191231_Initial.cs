@@ -54,6 +54,7 @@ namespace NotificationPlatform.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Type = table.Column<EmailContactPropertyType>(type: "email_contact_property_type", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
+                    Show = table.Column<bool>(type: "boolean", nullable: false),
                     EmailConfigurationId = table.Column<Guid>(type: "uuid", nullable: false),
                     Choices = table.Column<string[]>(type: "text[]", nullable: true),
                     Tenant = table.Column<string>(type: "text", nullable: false)
@@ -76,7 +77,6 @@ namespace NotificationPlatform.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     EmailAddress = table.Column<string>(type: "text", nullable: false),
                     EmailConfigurationId = table.Column<Guid>(type: "uuid", nullable: true),
-                    EmailContactPropertyId = table.Column<Guid>(type: "uuid", nullable: true),
                     Tenant = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -87,11 +87,36 @@ namespace NotificationPlatform.Migrations
                         column: x => x.EmailConfigurationId,
                         principalTable: "EmailConfigurations",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmailContactPropertyValues",
+                columns: table => new
+                {
+                    ContactId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PropertyId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Type = table.Column<EmailContactPropertyType>(type: "email_contact_property_type", nullable: false),
+                    EmailContactChoicePropertyValue_Value = table.Column<string>(type: "text", nullable: true),
+                    EmailContactDatePropertyValue_Value = table.Column<DateOnly>(type: "date", nullable: true),
+                    Value = table.Column<double>(type: "double precision", nullable: true),
+                    EmailContactStringPropertyValue_Value = table.Column<string>(type: "text", nullable: true),
+                    Tenant = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailContactPropertyValues", x => new { x.ContactId, x.PropertyId });
                     table.ForeignKey(
-                        name: "FK_EmailContacts_EmailContactProperties_EmailContactPropertyId",
-                        column: x => x.EmailContactPropertyId,
+                        name: "FK_EmailContactPropertyValues_EmailContactProperties_PropertyId",
+                        column: x => x.PropertyId,
                         principalTable: "EmailContactProperties",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EmailContactPropertyValues_EmailContacts_ContactId",
+                        column: x => x.ContactId,
+                        principalTable: "EmailContacts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -112,24 +137,27 @@ namespace NotificationPlatform.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_EmailContactPropertyValues_PropertyId",
+                table: "EmailContactPropertyValues",
+                column: "PropertyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EmailContacts_EmailConfigurationId",
                 table: "EmailContacts",
                 column: "EmailConfigurationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EmailContacts_EmailContactPropertyId",
-                table: "EmailContacts",
-                column: "EmailContactPropertyId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "EmailContacts");
+                name: "EmailContactPropertyValues");
 
             migrationBuilder.DropTable(
                 name: "EmailContactProperties");
+
+            migrationBuilder.DropTable(
+                name: "EmailContacts");
 
             migrationBuilder.DropTable(
                 name: "EmailConfigurations");

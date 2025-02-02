@@ -1,4 +1,3 @@
-using NotificationPlatform.Models;
 using NotificationPlatform.Models.Email;
 
 namespace NotificationPlatform.Data;
@@ -16,7 +15,7 @@ public class DevelopmentSeeder {
                 Tenant = "development-tenant",
                 EmailConfiguration = new() {
                     Tenant = "development-tenant",
-                    EmailContactProperties = [
+                    Properties = [
                         new EmailContactStringProperty() {
                             Tenant = "development-tenant",
                             Name = "First Name"
