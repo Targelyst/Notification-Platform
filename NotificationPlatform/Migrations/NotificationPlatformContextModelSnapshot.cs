@@ -55,7 +55,7 @@ namespace NotificationPlatform.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("EmailConfigurationId")
+                    b.Property<Guid>("EmailConfigurationId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Tenant")
@@ -256,9 +256,13 @@ namespace NotificationPlatform.Migrations
 
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContact", b =>
                 {
-                    b.HasOne("NotificationPlatform.Models.Email.EmailConfiguration", null)
+                    b.HasOne("NotificationPlatform.Models.Email.EmailConfiguration", "EmailConfiguration")
                         .WithMany("Contacts")
-                        .HasForeignKey("EmailConfigurationId");
+                        .HasForeignKey("EmailConfigurationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EmailConfiguration");
                 });
 
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactProperty", b =>

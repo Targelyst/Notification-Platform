@@ -4,6 +4,9 @@ public class EmailContact : KeyedEntity {
 
     public required string EmailAddress { get; set; }
 
+    public Guid EmailConfigurationId { get; set; }
+    public EmailConfiguration EmailConfiguration { get; set; } = null!;
+
     public List<EmailContactPropertyValue> Properties { get; set; } = [];
 
 }

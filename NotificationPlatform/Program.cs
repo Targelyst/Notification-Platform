@@ -68,6 +68,7 @@ builder.Services
     .AddAuthorization()
     .AddProjections()
     .AddFiltering()
+    .AddSorting()
     .RegisterDbContextFactory<NotificationPlatformContext>()
     .AddTypes()
     .AddType<EmailContactStringProperty>()
@@ -80,6 +81,12 @@ builder.Services
     .AddType<EmailContactChoicePropertyValue>()
     .ModifyRequestOptions(
         opt => opt.IncludeExceptionDetails = builder.Environment.IsDevelopment()
+    )
+    .ModifyPagingOptions(
+        opt => {
+            opt.IncludeTotalCount = true;
+            opt.MaxPageSize = 100;
+        }
     );
 
 var app = builder.Build();

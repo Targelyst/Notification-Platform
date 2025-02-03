@@ -13,6 +13,7 @@ public enum EmailContactPropertyType {
 [Index(nameof(Type), nameof(Name), IsUnique = true)]
 public abstract class EmailContactProperty : KeyedEntity {
 
+    [GraphQLIgnore]
     public EmailContactPropertyType Type { get; set; }
     public required string Name { get; set; }
     public bool Show { get; set; } = true;

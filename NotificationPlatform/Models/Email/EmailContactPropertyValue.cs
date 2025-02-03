@@ -6,6 +6,7 @@ namespace NotificationPlatform.Models.Email;
 [PrimaryKey(nameof(ContactId), nameof(PropertyId))]
 public abstract class EmailContactPropertyValue : Entity {
 
+    [GraphQLIgnore]
     public EmailContactPropertyType Type { get; set; }
     public Guid ContactId { get; set; }
     public EmailContact Contact { get; set; } = null!;

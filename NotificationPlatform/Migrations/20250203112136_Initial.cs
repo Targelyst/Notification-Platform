@@ -76,7 +76,7 @@ namespace NotificationPlatform.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     EmailAddress = table.Column<string>(type: "text", nullable: false),
-                    EmailConfigurationId = table.Column<Guid>(type: "uuid", nullable: true),
+                    EmailConfigurationId = table.Column<Guid>(type: "uuid", nullable: false),
                     Tenant = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -86,7 +86,8 @@ namespace NotificationPlatform.Migrations
                         name: "FK_EmailContacts_EmailConfigurations_EmailConfigurationId",
                         column: x => x.EmailConfigurationId,
                         principalTable: "EmailConfigurations",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
