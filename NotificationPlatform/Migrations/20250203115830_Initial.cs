@@ -75,6 +75,7 @@ namespace NotificationPlatform.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     EmailAddress = table.Column<string>(type: "text", nullable: false),
                     EmailConfigurationId = table.Column<Guid>(type: "uuid", nullable: false),
                     Tenant = table.Column<string>(type: "text", nullable: false)

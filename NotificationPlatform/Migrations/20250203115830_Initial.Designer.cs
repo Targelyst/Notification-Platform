@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NotificationPlatform.Migrations
 {
     [DbContext(typeof(NotificationPlatformContext))]
-    [Migration("20250203112136_Initial")]
+    [Migration("20250203115830_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -53,6 +53,9 @@ namespace NotificationPlatform.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("EmailAddress")
                         .IsRequired()
