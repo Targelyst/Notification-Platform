@@ -69,6 +69,7 @@ builder.Services
     .AddProjections()
     .AddFiltering()
     .AddSorting()
+    .AddMutationConventions(applyToAllMutations: true)
     .RegisterDbContextFactory<NotificationPlatformContext>()
     .AddTypes()
     .AddType<EmailContactStringProperty>()
