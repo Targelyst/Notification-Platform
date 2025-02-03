@@ -1,0 +1,35 @@
+{
+    "theme": {
+      "colors": {
+        "primary": {
+          "DEFAULT": "#5300E8",
+          "content": "#FEFEFE"
+        },
+        "secondary": {
+          "DEFAULT": "#D5CDFF",
+          "content": "#6B12FF"
+        },
+        "background": {
+          "DEFAULT": "#0E0E11",
+          "content": "#FAFAFA"
+        },
+        "surface": {
+          "DEFAULT": "#18181B",
+          "content": "#FAFAFA"
+        }
+      },
+      "extend": {
+        "typography": {
+          "DEFAULT": {
+            "css": {
+              "--tw-prose-headings": "var(--color-surface-content)",
+              "h1, h2, h3, h4": {
+                "font-family": "Plus Jakarta Sans"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  

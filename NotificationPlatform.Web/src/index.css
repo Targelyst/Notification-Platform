@@ -1,1 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Poppins:wght@400;500&display=swap');
 @import "tailwindcss";
+
+@layer base {
+  h1, h2, h3, h4 {
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+  body {
+    font-family: "Poppins", sans-serif;
+  }
+}
+
+@theme {
+  --color-impolar-primary: #5300E8;
+  --color-impolar-primary-text: #FEFEFE;
+  --color-impolar-secondary: #D5CDFF;
+  --color-impolar-secondary-text: #6B12FF;
+  --color-impolar-bg: #0E0E11;
+  --color-impolar-bg-text: #FAFAFA;
+  --color-impolar-bg-surface: #18181B;
+  --color-impolar-bg-surface-text: #FAFAFA;
+  --color-impolar-bg-highlight: #28252D;
+  --color-impolar-bg-highlight-text: #FAFAFA;
+}
+
+@utility impolar-* {
+  background-color: --value(--color-impolar-*);
+  color: --value(--color-impolar-*-text);
+}
