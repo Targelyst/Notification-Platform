@@ -1,10 +1,19 @@
-function App() {
-	return (
-		<>
-			<h1 className="text-xl font-bold">Notification Platform</h1>
-			<p className="text-purple-500">Welcome to the Notification Platform!</p>
-		</>
-	);
-}
+import { BrowserRouter as Router } from "react-router-dom";
+import "./i18n";
+import { Navigation } from "./components/Navigation";
+import Dashboard from "./components/Dashboard";
+
+const App = () => {
+  return (
+    <div className="relative h-screen flex bg-impolar-bg">
+      <Router>
+        <div className="relative z-10 flex-1 flex">
+          <Navigation />
+          <Dashboard />
+        </div>
+      </Router>
+    </div>
+  );
+};
 
 export default App;
