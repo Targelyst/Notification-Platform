@@ -1,6 +1,8 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using NotificationPlatform.Auth;
 using NotificationPlatform.Configuration;
 using NotificationPlatform.Data;
@@ -33,7 +35,24 @@ builder.Services.AddDbContextFactory<NotificationPlatformContext>(opt => {
 
 builder.Services
     .AddHttpContextAccessor()
-    .AddScoped<IAuthorizationHandler, HasTenantHandler>();
+    .AddScoped<IAuthorizationHandler, HasTenantHandler>()
+    .AddCors(options => {
+        options.AddDefaultPolicy(policy => {
+            var origins = builder.Configuration
+                .GetSection(WebConfiguration.Section)
+                .Get<WebConfiguration>()?
+                .CorsOrigins
+                ?? throw new Exception(
+                    $"Could not get configuration section {WebConfiguration.Section}"
+                );
+
+            policy
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .WithOrigins(origins);
+            // .WithHeaders(HeaderNames.Authorization, HeaderNames.ContentType);
+        });
+    });
 
 if (!builder.Environment.IsDevelopment()) {
     builder.Services
@@ -99,6 +118,7 @@ if (app.Environment.IsDevelopment()) {
     app.UseAuthorization();
 }
 
+app.UseCors();
 app.MapGraphQL();
 
 app.RunWithGraphQLCommands(args);
