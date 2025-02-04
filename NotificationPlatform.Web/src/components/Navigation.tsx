@@ -11,36 +11,39 @@ import {
 } from "react-icons/fi";
 import { routes } from "../routes";
 import { UserWidget } from "../components/UserWidget";
+import { useAvailableProjects, useCurrentProject } from "../api/projects";
+import type { Project } from "../gql/graphql";
 
 interface SidebarProps {
 	isMobile: boolean;
-	openSubmenus: Record<string, boolean>;
-	toggleSubmenu: (path: string) => void;
-	selectedWorkspace: string;
-	setSelectedWorkspace: (workspace: string) => void;
 	isUserMenuOpen: boolean;
+	openSubmenus: Record<string, boolean>;
+
 	setIsUserMenuOpen: (open: boolean) => void;
+	toggleSubmenu: (path: string) => void;
 }
 
-const workspaces = [
-	{ id: "ws1", name: "Workspace 1" },
-	{ id: "ws2", name: "Workspace 2" },
-	{ id: "sep1", name: "Separator", isSeparator: true },
-	{ id: "add", name: "Add New Workspace" },
-];
+// const workspaces = [
+// 	{ id: "ws1", name: "Workspace 1" },
+// 	{ id: "ws2", name: "Workspace 2" },
+// 	{ id: "sep1", name: "Separator", isSeparator: true },
+// 	{ id: "add", name: "Add New Workspace" },
+// ];
 
 const Sidebar = ({
 	isMobile,
 	openSubmenus,
 	toggleSubmenu,
-	selectedWorkspace,
-	setSelectedWorkspace,
 	isUserMenuOpen,
 	setIsUserMenuOpen,
 }: SidebarProps) => {
 	const { t } = useTranslation();
 	const location = useLocation();
 	const navigate = useNavigate();
+
+	const [{ data: availableProjects }] = useAvailableProjects();
+	const { currentProject, setCurrentProject } = useCurrentProject();
+
 	const [isLocalUserMenuOpen, setIsLocalUserMenuOpen] = useState(false);
 	const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -70,9 +73,13 @@ const Sidebar = ({
 						<div className="bg-impolar-secondary p-1.5 rounded-lg">
 							<FiUser className="w-4 h-4 text-impolar-bg-highlight-text" />
 						</div>
-						<span className="font-medium text-impolar-bg-highlight-text text-sm">
-							{selectedWorkspace}
-						</span>
+						{currentProject ? (
+							<span className="font-medium text-impolar-bg-highlight-text text-sm">
+								{currentProject.name}
+							</span>
+						) : (
+							<span>Loading</span>
+						)}
 					</div>
 					<FiChevronDown
 						className={`text-impolar-bg-surface-text transform transition-transform ${
@@ -90,29 +97,29 @@ const Sidebar = ({
 					className={`absolute w-full z-10 ${isUserMenuOpen ? "block" : "hidden"}`}
 				>
 					<div className="bg-impolar-bg-surface rounded-lg shadow-lg border border-impolar-bg-highlight mt-1">
-						{workspaces.map((workspace) =>
-							workspace.isSeparator ? (
-								<hr
-									key={workspace.id}
-									className="border-impolar-bg-highlight my-1"
-								/>
-							) : (
-								<button
-									key={workspace.id}
-									type="button"
-									onClick={() => {
-										setSelectedWorkspace(workspace.name);
-										setIsUserMenuOpen(false);
-									}}
-									className="w-full px-3 py-2 text-left hover:bg-impolar-secondary/10 rounded-md transition-colors text-impolar-bg-highlight-text text-sm flex items-center space-x-2"
-								>
-									{workspace.id === "add" && (
-										<span className="text-impolar-bg-surface-text">+</span>
-									)}
-									<span>{workspace.name}</span>
-								</button>
-							),
-						)}
+						{/* {(workspaceConfig?.availableWorkspaces ?? []).map((workspace) => */}
+						{/* 	workspace.isSeparator ? ( */}
+						{/* 		<hr */}
+						{/* 			key={workspace.id} */}
+						{/* 			className="border-impolar-bg-highlight my-1" */}
+						{/* 		/> */}
+						{/* 	) : ( */}
+						{/* 		<button */}
+						{/* 			key={workspace.id} */}
+						{/* 			type="button" */}
+						{/* 			onClick={() => { */}
+						{/* 				setSelectedWorkspace(workspace.name); */}
+						{/* 				setIsUserMenuOpen(false); */}
+						{/* 			}} */}
+						{/* 			className="w-full px-3 py-2 text-left hover:bg-impolar-secondary/10 rounded-md transition-colors text-impolar-bg-highlight-text text-sm flex items-center space-x-2" */}
+						{/* 		> */}
+						{/* 			{workspace.id === "add" && ( */}
+						{/* 				<span className="text-impolar-bg-surface-text">+</span> */}
+						{/* 			)} */}
+						{/* 			<span>{workspace.name}</span> */}
+						{/* 		</button> */}
+						{/* 	), */}
+						{/* )} */}
 					</div>
 				</div>
 			</div>
@@ -224,7 +231,7 @@ export const Navigation = () => {
 	const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 	const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
-	const [selectedWorkspace, setSelectedWorkspace] = useState("Workspace 1");
+
 	const sidebarRef = useRef<HTMLDivElement>(null);
 
 	const toggleSubmenu = (path: string) => {
@@ -275,8 +282,6 @@ export const Navigation = () => {
 					isMobile={false}
 					openSubmenus={openSubmenus}
 					toggleSubmenu={toggleSubmenu}
-					selectedWorkspace={selectedWorkspace}
-					setSelectedWorkspace={setSelectedWorkspace}
 					isUserMenuOpen={isUserMenuOpen}
 					setIsUserMenuOpen={setIsUserMenuOpen}
 				/>
@@ -298,8 +303,6 @@ export const Navigation = () => {
 					isMobile={true}
 					openSubmenus={openSubmenus}
 					toggleSubmenu={toggleSubmenu}
-					selectedWorkspace={selectedWorkspace}
-					setSelectedWorkspace={setSelectedWorkspace}
 					isUserMenuOpen={isUserMenuOpen}
 					setIsUserMenuOpen={setIsUserMenuOpen}
 				/>
