@@ -12,7 +12,6 @@ import {
 import { routes } from "../routes";
 import { UserWidget } from "../components/UserWidget";
 import { useAvailableProjects, useCurrentProject } from "../api/projects";
-import type { Project } from "../gql/graphql";
 
 interface SidebarProps {
 	isMobile: boolean;
@@ -22,13 +21,6 @@ interface SidebarProps {
 	setIsUserMenuOpen: (open: boolean) => void;
 	toggleSubmenu: (path: string) => void;
 }
-
-// const workspaces = [
-// 	{ id: "ws1", name: "Workspace 1" },
-// 	{ id: "ws2", name: "Workspace 2" },
-// 	{ id: "sep1", name: "Separator", isSeparator: true },
-// 	{ id: "add", name: "Add New Workspace" },
-// ];
 
 const Sidebar = ({
 	isMobile,
@@ -47,6 +39,10 @@ const Sidebar = ({
 	const [isLocalUserMenuOpen, setIsLocalUserMenuOpen] = useState(false);
 	const userMenuRef = useRef<HTMLDivElement>(null);
 
+	const onProjectAdd = () => {
+		console.warn("Add project is not implemented.");
+	};
+
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (
@@ -60,7 +56,7 @@ const Sidebar = ({
 
 		document.addEventListener("mousedown", handleClickOutside);
 		return () => document.removeEventListener("mousedown", handleClickOutside);
-	}, []);
+	}, [setIsUserMenuOpen]);
 
 	return (
 		<nav className="flex flex-col h-full space-y-1">
@@ -97,29 +93,28 @@ const Sidebar = ({
 					className={`absolute w-full z-10 ${isUserMenuOpen ? "block" : "hidden"}`}
 				>
 					<div className="bg-impolar-bg-surface rounded-lg shadow-lg border border-impolar-bg-highlight mt-1">
-						{/* {(workspaceConfig?.availableWorkspaces ?? []).map((workspace) => */}
-						{/* 	workspace.isSeparator ? ( */}
-						{/* 		<hr */}
-						{/* 			key={workspace.id} */}
-						{/* 			className="border-impolar-bg-highlight my-1" */}
-						{/* 		/> */}
-						{/* 	) : ( */}
-						{/* 		<button */}
-						{/* 			key={workspace.id} */}
-						{/* 			type="button" */}
-						{/* 			onClick={() => { */}
-						{/* 				setSelectedWorkspace(workspace.name); */}
-						{/* 				setIsUserMenuOpen(false); */}
-						{/* 			}} */}
-						{/* 			className="w-full px-3 py-2 text-left hover:bg-impolar-secondary/10 rounded-md transition-colors text-impolar-bg-highlight-text text-sm flex items-center space-x-2" */}
-						{/* 		> */}
-						{/* 			{workspace.id === "add" && ( */}
-						{/* 				<span className="text-impolar-bg-surface-text">+</span> */}
-						{/* 			)} */}
-						{/* 			<span>{workspace.name}</span> */}
-						{/* 		</button> */}
-						{/* 	), */}
-						{/* )} */}
+						{(availableProjects?.projects ?? [])
+							.filter((project) => project.id !== currentProject?.id)
+							.map((project) => (
+								<button
+									key={project.id}
+									type="button"
+									onClick={() => {
+										setCurrentProject(project.id);
+										setIsUserMenuOpen(false);
+									}}
+									className="w-full px-3 py-2 text-left hover:bg-impolar-secondary/10 rounded-md transition-colors text-impolar-bg-highlight-text text-sm flex items-center space-x-2"
+								>
+									{project.name}
+								</button>
+							))}
+						<button
+							type="button"
+							onClick={onProjectAdd}
+							className="w-full px-3 py-2 text-left hover:bg-impolar-secondary/10 rounded-md transition-colors text-impolar-bg-highlight-text text-sm flex items-center space-x-2"
+						>
+							<span className="text-impolar-bg-surface-text">+</span>
+						</button>
 					</div>
 				</div>
 			</div>
