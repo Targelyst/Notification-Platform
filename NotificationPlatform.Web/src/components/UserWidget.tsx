@@ -67,15 +67,15 @@ export const UserWidget = ({
 			<button
 				type="button"
 				onClick={handleToggle}
-				className="flex items-center space-x-2 group w-full p-2 rounded-lg 
-          transition-colors text-stone-300 hover:bg-stone-600/20 hover:text-stone-100"
+				className="flex items-center space-x-2 bg-impolar-bg-highlight group w-full p-2 rounded-lg 
+          transition-colors  hover:bg-stone-600/20 hover:text-stone-100 "
 			>
 				<div className="relative">
 					<div
 						className="w-7 h-7 rounded-full bg-stone-400/10 border border-stone-400/20 
             flex items-center justify-center shadow-xs"
 					>
-						<FiUser className="w-3.5 h-3.5 text-stone-300" />
+						<FiUser className="w-3.5 h-3.5 " />
 					</div>
 					<div
 						className="absolute bottom-0.5 right-0 w-2 h-2 rounded-full bg-green-400 
@@ -86,7 +86,7 @@ export const UserWidget = ({
 					<>
 						<span className="text-sm ">Artur OG</span>
 						<FiChevronDown
-							className={`text-stone-400/80 transition-transform ${isMenuOpen ? "rotate-180" : ""}`}
+							className={`transition-transform ${isMenuOpen ? "rotate-180" : ""}`}
 						/>
 					</>
 				)}
@@ -97,17 +97,17 @@ export const UserWidget = ({
 					<button
 						type="button"
 						className="w-full flex items-center p-1.5 rounded-md transition-colors 
-            text-sm text-stone-300 hover:bg-stone-500/20 hover:text-stone-100 space-x-2"
+            text-sm  hover:bg-stone-500/20 hover:text-stone-100 space-x-2"
 					>
-						<FiSettings className="w-3.5 h-3.5 text-stone-300" />
+						<FiSettings className="w-3.5 h-3.5 " />
 						<span>Account Settings</span>
 					</button>
 					<button
 						type="button"
 						className="w-full flex items-center p-1.5 rounded-md transition-colors 
-            text-sm text-stone-300 hover:bg-stone-500/20 hover:text-stone-100 space-x-2"
+            text-sm  hover:bg-stone-500/20 hover:text-stone-100 space-x-2"
 					>
-						<FiLogOut className="w-3.5 h-3.5 text-stone-300" />
+						<FiLogOut className="w-3.5 h-3.5 " />
 						<span>Log Out</span>
 					</button>
 				</div>
