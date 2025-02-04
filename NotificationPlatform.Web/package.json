@@ -4,11 +4,11 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
+		"dev": "concurrently -p '[{name}]' -n 'vite,graphql' -c 'bgBlue,bgGreen' vite 'graphql-codegen-esm -w'",
 		"build": "tsc -b && vite build",
-		"lint": "eslint .",
+		"lint": "biome check",
 		"preview": "vite preview",
-		"codegen": "graphql-codegen"
+		"codegen": "graphql-codegen-esm"
 	},
 	"dependencies": {
 		"@editorjs/code": "^2.9.3",
@@ -35,10 +35,13 @@
 		"@biomejs/biome": "1.9.4",
 		"@graphql-codegen/cli": "^5.0.4",
 		"@graphql-codegen/client-preset": "^4.6.1",
+		"@graphql-typed-document-node/core": "^3.2.0",
+		"@parcel/watcher": "^2.5.1",
 		"@types/editorjs__header": "^2.6.3",
 		"@types/react": "^18.3.18",
 		"@types/react-dom": "^18.3.5",
 		"@vitejs/plugin-react-swc": "^3.5.0",
+		"concurrently": "^9.1.2",
 		"graphql": "^16.10.0",
 		"lefthook": "^1.10.10",
 		"react-i18next": "^15.4.0",
