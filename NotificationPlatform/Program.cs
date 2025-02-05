@@ -111,6 +111,8 @@ builder.Services
 
 var app = builder.Build();
 
+app.UseCors();
+
 if (app.Environment.IsDevelopment()) {
     app.UseSeeding();
 } else {
@@ -118,7 +120,6 @@ if (app.Environment.IsDevelopment()) {
     app.UseAuthorization();
 }
 
-app.UseCors();
 app.MapGraphQL();
 
 app.RunWithGraphQLCommands(args);
