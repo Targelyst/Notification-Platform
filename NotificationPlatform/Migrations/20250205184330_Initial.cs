@@ -92,6 +92,29 @@ namespace NotificationPlatform.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EmailTransports",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Host = table.Column<string>(type: "text", nullable: false),
+                    Port = table.Column<int>(type: "integer", nullable: false),
+                    User = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<byte[]>(type: "bytea", nullable: false),
+                    EmailConfigurationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Tenant = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailTransports", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EmailTransports_EmailConfigurations_EmailConfigurationId",
+                        column: x => x.EmailConfigurationId,
+                        principalTable: "EmailConfigurations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "EmailContactPropertyValues",
                 columns: table => new
                 {
@@ -117,6 +140,26 @@ namespace NotificationPlatform.Migrations
                         name: "FK_EmailContactPropertyValues_EmailContacts_ContactId",
                         column: x => x.ContactId,
                         principalTable: "EmailContacts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmailTransportSenderAddresses",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Address = table.Column<string>(type: "text", nullable: false),
+                    TransportId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Tenant = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailTransportSenderAddresses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EmailTransportSenderAddresses_EmailTransports_TransportId",
+                        column: x => x.TransportId,
+                        principalTable: "EmailTransports",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -147,6 +190,17 @@ namespace NotificationPlatform.Migrations
                 name: "IX_EmailContacts_EmailConfigurationId",
                 table: "EmailContacts",
                 column: "EmailConfigurationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailTransports_EmailConfigurationId",
+                table: "EmailTransports",
+                column: "EmailConfigurationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailTransportSenderAddresses_TransportId_Address",
+                table: "EmailTransportSenderAddresses",
+                columns: new[] { "TransportId", "Address" },
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -156,10 +210,16 @@ namespace NotificationPlatform.Migrations
                 name: "EmailContactPropertyValues");
 
             migrationBuilder.DropTable(
+                name: "EmailTransportSenderAddresses");
+
+            migrationBuilder.DropTable(
                 name: "EmailContactProperties");
 
             migrationBuilder.DropTable(
                 name: "EmailContacts");
+
+            migrationBuilder.DropTable(
+                name: "EmailTransports");
 
             migrationBuilder.DropTable(
                 name: "EmailConfigurations");
