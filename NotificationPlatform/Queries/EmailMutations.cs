@@ -15,6 +15,7 @@ public static class EmailMutations {
         int port,
         string user,
         string password,
+        [GraphQLType<ListType<EmailAddressType>>]
         List<string>? senderAddresses,
         NotificationPlatformContext db,
         IUserService userService
@@ -56,7 +57,7 @@ public static class EmailMutations {
     [UseProjection]
     public static async Task<IQueryable<EmailTransportSenderAddress>?> AddEmailTransportSenderAddressAsync(
         Guid emailTransportId,
-        // TODO: Validate
+        [GraphQLType<EmailAddressType>]
         string address,
         NotificationPlatformContext db,
         IUserService userService
