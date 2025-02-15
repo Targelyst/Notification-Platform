@@ -21,7 +21,8 @@ namespace NotificationPlatform.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    Tenant = table.Column<string>(type: "text", nullable: false)
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -34,7 +35,8 @@ namespace NotificationPlatform.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ProjectId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Tenant = table.Column<string>(type: "text", nullable: false)
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -57,7 +59,8 @@ namespace NotificationPlatform.Migrations
                     Show = table.Column<bool>(type: "boolean", nullable: false),
                     EmailConfigurationId = table.Column<Guid>(type: "uuid", nullable: false),
                     Choices = table.Column<string[]>(type: "text[]", nullable: true),
-                    Tenant = table.Column<string>(type: "text", nullable: false)
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -75,10 +78,10 @@ namespace NotificationPlatform.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     EmailAddress = table.Column<string>(type: "text", nullable: false),
                     EmailConfigurationId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Tenant = table.Column<string>(type: "text", nullable: false)
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -101,7 +104,8 @@ namespace NotificationPlatform.Migrations
                     User = table.Column<string>(type: "text", nullable: false),
                     Password = table.Column<byte[]>(type: "bytea", nullable: false),
                     EmailConfigurationId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Tenant = table.Column<string>(type: "text", nullable: false)
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -125,7 +129,8 @@ namespace NotificationPlatform.Migrations
                     EmailContactDatePropertyValue_Value = table.Column<DateOnly>(type: "date", nullable: true),
                     Value = table.Column<double>(type: "double precision", nullable: true),
                     EmailContactStringPropertyValue_Value = table.Column<string>(type: "text", nullable: true),
-                    Tenant = table.Column<string>(type: "text", nullable: false)
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -151,7 +156,8 @@ namespace NotificationPlatform.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Address = table.Column<string>(type: "text", nullable: false),
                     TransportId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Tenant = table.Column<string>(type: "text", nullable: false)
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
