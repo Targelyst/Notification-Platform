@@ -1,8 +1,6 @@
-using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Net.Http.Headers;
 using NotificationPlatform.Auth;
 using NotificationPlatform.Configuration;
 using NotificationPlatform.Data;
@@ -21,6 +19,11 @@ builder.Services.AddOptions<AuthConfiguration>()
   .ValidateDataAnnotations()
   .ValidateOnStart();
 
+builder.Services.AddOptions<SecurityConfiguration>()
+  .Bind(builder.Configuration.GetSection(SecurityConfiguration.Section))
+  .ValidateDataAnnotations()
+  .ValidateOnStart();
+
 builder.Services.AddDbContextFactory<NotificationPlatformContext>(opt => {
     var c = builder.Configuration.GetSection(DatabaseConfiguration.Section).Get<DatabaseConfiguration>()
       ?? throw new Exception($"Could not get configuration section {DatabaseConfiguration.Section}");
@@ -36,6 +39,8 @@ builder.Services.AddDbContextFactory<NotificationPlatformContext>(opt => {
 builder.Services
     .AddHttpContextAccessor()
     .AddScoped<IAuthorizationHandler, HasTenantHandler>()
+    .AddScoped<EmailContactPropertyService>()
+    .AddSingleton<ICryptographyService, CryptographyServiceAES>()
     .AddCors(options => {
         options.AddDefaultPolicy(policy => {
             var origins = builder.Configuration
@@ -50,6 +55,7 @@ builder.Services
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .WithOrigins(origins);
+            // TODO: Restrict headers?
             // .WithHeaders(HeaderNames.Authorization, HeaderNames.ContentType);
         });
     });
@@ -106,6 +112,11 @@ builder.Services
         opt => {
             opt.IncludeTotalCount = true;
             opt.MaxPageSize = 100;
+        }
+    )
+    .ModifyOptions(
+        opt => {
+            opt.EnableOneOf = true;
         }
     );
 

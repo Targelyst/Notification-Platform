@@ -21,6 +21,30 @@ export type Scalars = {
   UUID: { input: any; output: any; }
 };
 
+export type AddEmailTransportInput = {
+  emailConfigurationId: Scalars['UUID']['input'];
+  host: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  port: Scalars['Int']['input'];
+  senderAddresses?: InputMaybe<Array<Scalars['String']['input']>>;
+  user: Scalars['String']['input'];
+};
+
+export type AddEmailTransportPayload = {
+  __typename?: 'AddEmailTransportPayload';
+  emailTransport?: Maybe<Array<EmailTransport>>;
+};
+
+export type AddEmailTransportSenderAddressInput = {
+  address: Scalars['String']['input'];
+  emailTransportId: Scalars['UUID']['input'];
+};
+
+export type AddEmailTransportSenderAddressPayload = {
+  __typename?: 'AddEmailTransportSenderAddressPayload';
+  emailTransportSenderAddress?: Maybe<Array<EmailTransportSenderAddress>>;
+};
+
 /** Defines when a policy shall be executed. */
 export enum ApplyPolicy {
   /** After the resolver was executed. */
@@ -57,12 +81,19 @@ export type EmailConfiguration = {
   project: Project;
   projectId: Scalars['UUID']['output'];
   properties: Array<EmailContactProperty>;
+  transports: Array<EmailTransport>;
 };
 
 
 export type EmailConfigurationPropertiesArgs = {
   order?: InputMaybe<Array<EmailContactPropertySortInput>>;
   where?: InputMaybe<EmailContactPropertyFilterInput>;
+};
+
+
+export type EmailConfigurationTransportsArgs = {
+  order?: InputMaybe<Array<EmailTransportSortInput>>;
+  where?: InputMaybe<EmailTransportFilterInput>;
 };
 
 export type EmailConfigurationFilterInput = {
@@ -72,6 +103,7 @@ export type EmailConfigurationFilterInput = {
   project?: InputMaybe<ProjectFilterInput>;
   projectId?: InputMaybe<UuidOperationFilterInput>;
   properties?: InputMaybe<ListFilterInputTypeOfEmailContactPropertyFilterInput>;
+  transports?: InputMaybe<ListFilterInputTypeOfEmailTransportFilterInput>;
 };
 
 export type EmailConfigurationSortInput = {
@@ -244,6 +276,83 @@ export type EmailContactsEdge = {
   node: EmailContact;
 };
 
+export type EmailTransport = {
+  __typename?: 'EmailTransport';
+  emailConfiguration: EmailConfiguration;
+  emailConfigurationId: Scalars['UUID']['output'];
+  host: Scalars['String']['output'];
+  id: Scalars['UUID']['output'];
+  port: Scalars['Int']['output'];
+  senderAddresses: Array<EmailTransportSenderAddress>;
+  user: Scalars['String']['output'];
+};
+
+
+export type EmailTransportSenderAddressesArgs = {
+  order?: InputMaybe<Array<EmailTransportSenderAddressSortInput>>;
+  where?: InputMaybe<EmailTransportSenderAddressFilterInput>;
+};
+
+export type EmailTransportFilterInput = {
+  and?: InputMaybe<Array<EmailTransportFilterInput>>;
+  emailConfiguration?: InputMaybe<EmailConfigurationFilterInput>;
+  emailConfigurationId?: InputMaybe<UuidOperationFilterInput>;
+  host?: InputMaybe<StringOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  or?: InputMaybe<Array<EmailTransportFilterInput>>;
+  port?: InputMaybe<IntOperationFilterInput>;
+  senderAddresses?: InputMaybe<ListFilterInputTypeOfEmailTransportSenderAddressFilterInput>;
+  user?: InputMaybe<StringOperationFilterInput>;
+};
+
+export type EmailTransportSenderAddress = {
+  __typename?: 'EmailTransportSenderAddress';
+  address: Scalars['String']['output'];
+  id: Scalars['UUID']['output'];
+  transport: EmailTransport;
+  transportId: Scalars['UUID']['output'];
+};
+
+export type EmailTransportSenderAddressFilterInput = {
+  address?: InputMaybe<StringOperationFilterInput>;
+  and?: InputMaybe<Array<EmailTransportSenderAddressFilterInput>>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  or?: InputMaybe<Array<EmailTransportSenderAddressFilterInput>>;
+  transport?: InputMaybe<EmailTransportFilterInput>;
+  transportId?: InputMaybe<UuidOperationFilterInput>;
+};
+
+export type EmailTransportSenderAddressSortInput = {
+  address?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  transport?: InputMaybe<EmailTransportSortInput>;
+  transportId?: InputMaybe<SortEnumType>;
+};
+
+export type EmailTransportSortInput = {
+  emailConfiguration?: InputMaybe<EmailConfigurationSortInput>;
+  emailConfigurationId?: InputMaybe<SortEnumType>;
+  host?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  port?: InputMaybe<SortEnumType>;
+  user?: InputMaybe<SortEnumType>;
+};
+
+export type IntOperationFilterInput = {
+  eq?: InputMaybe<Scalars['Int']['input']>;
+  gt?: InputMaybe<Scalars['Int']['input']>;
+  gte?: InputMaybe<Scalars['Int']['input']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  lt?: InputMaybe<Scalars['Int']['input']>;
+  lte?: InputMaybe<Scalars['Int']['input']>;
+  neq?: InputMaybe<Scalars['Int']['input']>;
+  ngt?: InputMaybe<Scalars['Int']['input']>;
+  ngte?: InputMaybe<Scalars['Int']['input']>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  nlt?: InputMaybe<Scalars['Int']['input']>;
+  nlte?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type ListFilterInputTypeOfEmailContactPropertyFilterInput = {
   all?: InputMaybe<EmailContactPropertyFilterInput>;
   any?: InputMaybe<Scalars['Boolean']['input']>;
@@ -258,9 +367,35 @@ export type ListFilterInputTypeOfEmailContactPropertyValueFilterInput = {
   some?: InputMaybe<EmailContactPropertyValueFilterInput>;
 };
 
+export type ListFilterInputTypeOfEmailTransportFilterInput = {
+  all?: InputMaybe<EmailTransportFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<EmailTransportFilterInput>;
+  some?: InputMaybe<EmailTransportFilterInput>;
+};
+
+export type ListFilterInputTypeOfEmailTransportSenderAddressFilterInput = {
+  all?: InputMaybe<EmailTransportSenderAddressFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<EmailTransportSenderAddressFilterInput>;
+  some?: InputMaybe<EmailTransportSenderAddressFilterInput>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  addEmailTransport: AddEmailTransportPayload;
+  addEmailTransportSenderAddress: AddEmailTransportSenderAddressPayload;
   updateProject: UpdateProjectPayload;
+};
+
+
+export type MutationAddEmailTransportArgs = {
+  input: AddEmailTransportInput;
+};
+
+
+export type MutationAddEmailTransportSenderAddressArgs = {
+  input: AddEmailTransportSenderAddressInput;
 };
 
 
