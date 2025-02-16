@@ -12,7 +12,6 @@ import {
 	FiUser,
 } from "react-icons/fi";
 import type { ReactNode } from "react";
-import EmailEditor from "./components/EmailEditor";
 import { Home } from "./pages/home/Home";
 import { UserPage } from "./pages/user/UserPage";
 
@@ -26,11 +25,7 @@ export interface RouteConfig {
 
 const AnalyticsComponent = () => (
 	<div>
-		Analytics{" "}
-		<div>
-			{" "}
-			<EmailEditor />
-		</div>
+		Analytics
 	</div>
 );
 
