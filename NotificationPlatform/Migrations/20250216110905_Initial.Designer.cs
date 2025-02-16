@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NotificationPlatform.Migrations
 {
     [DbContext(typeof(NotificationPlatformContext))]
-    [Migration("20250215145543_Initial")]
+    [Migration("20250216110905_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -145,6 +145,37 @@ namespace NotificationPlatform.Migrations
                     b.HasDiscriminator<EmailContactPropertyType>("Type");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailSegment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EmailConfigurationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Expression")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Tenant")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmailConfigurationId");
+
+                    b.ToTable("EmailSegments");
                 });
 
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailTransport", b =>
@@ -379,6 +410,17 @@ namespace NotificationPlatform.Migrations
                     b.Navigation("Property");
                 });
 
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailSegment", b =>
+                {
+                    b.HasOne("NotificationPlatform.Models.Email.EmailConfiguration", "EmailConfiguration")
+                        .WithMany("Segments")
+                        .HasForeignKey("EmailConfigurationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EmailConfiguration");
+                });
+
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailTransport", b =>
                 {
                     b.HasOne("NotificationPlatform.Models.Email.EmailConfiguration", "EmailConfiguration")
@@ -406,6 +448,8 @@ namespace NotificationPlatform.Migrations
                     b.Navigation("Contacts");
 
                     b.Navigation("Properties");
+
+                    b.Navigation("Segments");
 
                     b.Navigation("Transports");
                 });

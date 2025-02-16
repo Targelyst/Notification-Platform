@@ -16,4 +16,7 @@ public class EmailConfiguration : KeyedEntity {
     [UseSorting]
     public List<EmailTransport> Transports { get; set; } = [];
 
+    [UseFiltering]
+    public List<EmailSegment> Segments { get; set; } = [];
+
 }

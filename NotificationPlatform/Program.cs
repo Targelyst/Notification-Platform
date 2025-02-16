@@ -39,6 +39,7 @@ builder.Services.AddDbContextFactory<NotificationPlatformContext>(opt => {
 builder.Services
     .AddHttpContextAccessor()
     .AddScoped<IAuthorizationHandler, HasTenantHandler>()
+    .AddScoped<EmailContactPropertyService>()
     .AddSingleton<ICryptographyService, CryptographyServiceAES>()
     .AddCors(options => {
         options.AddDefaultPolicy(policy => {
@@ -111,6 +112,11 @@ builder.Services
         opt => {
             opt.IncludeTotalCount = true;
             opt.MaxPageSize = 100;
+        }
+    )
+    .ModifyOptions(
+        opt => {
+            opt.EnableOneOf = true;
         }
     );
 

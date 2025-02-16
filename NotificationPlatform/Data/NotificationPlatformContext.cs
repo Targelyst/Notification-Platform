@@ -33,12 +33,13 @@ public class NotificationPlatformContext : DbContext {
     public DbSet<EmailContactPropertyValue> EmailContactPropertyValues { get; set; }
     public DbSet<EmailContactStringPropertyValue> EmailContactStringProperties { get; set; }
     public DbSet<EmailContactStringPropertyValue> EmailContactStringPropertyValues { get; set; }
+    public DbSet<EmailSegment> EmailSegments { get; set; }
     public DbSet<EmailTransport> EmailTransports { get; set; }
     public DbSet<EmailTransportSenderAddress> EmailTransportSenderAddresses { get; set; }
     public DbSet<Project> Projects { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
-        this.configureColumnEncryption(modelBuilder);
+        configureColumnEncryption(modelBuilder);
 
         modelBuilder.Entity<EmailContactProperty>()
             .HasDiscriminator(p => p.Type)
@@ -58,6 +59,7 @@ public class NotificationPlatformContext : DbContext {
         modelBuilder.Entity<EmailContact>().HasQueryFilter(e => e.Tenant == userService.Tenant);
         modelBuilder.Entity<EmailContactProperty>().HasQueryFilter(e => e.Tenant == userService.Tenant);
         modelBuilder.Entity<EmailContactPropertyValue>().HasQueryFilter(e => e.Tenant == userService.Tenant);
+        modelBuilder.Entity<EmailSegment>().HasQueryFilter(e => e.Tenant == userService.Tenant);
         modelBuilder.Entity<EmailTransport>().HasQueryFilter(e => e.Tenant == userService.Tenant);
         modelBuilder.Entity<EmailTransportSenderAddress>().HasQueryFilter(e => e.Tenant == userService.Tenant);
         modelBuilder.Entity<Project>().HasQueryFilter(e => e.Tenant == userService.Tenant);

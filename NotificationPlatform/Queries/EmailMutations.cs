@@ -1,4 +1,6 @@
+using System.Text.Json;
 using NotificationPlatform.Data;
+using NotificationPlatform.Exceptions;
 using NotificationPlatform.Models.Email;
 using NotificationPlatform.Services;
 
@@ -76,6 +78,41 @@ public static class EmailMutations {
         await db.SaveChangesAsync();
 
         return db.EmailTransportSenderAddresses.Where(p => p.Id == newSender.Id);
+    }
+
+    [UseProjection]
+    [Error<EmailSegmentExpressionValidationException>]
+    public static async Task<IQueryable<EmailSegment>?> AddEmailSegmentAsync(
+        Guid emailConfigurationId,
+        string name,
+        [GraphQLType<JsonType>]
+        string expression,
+        NotificationPlatformContext db,
+        IUserService userService
+    ) {
+        var emailConfiguration = await db.EmailConfigurations.FindAsync(emailConfigurationId);
+
+        if (emailConfiguration is null) {
+            return null;
+        }
+
+        if (!EmailSegmentExpression.IsValidExpressionString(expression)) {
+            throw new EmailSegmentExpressionValidationException();
+        }
+
+        var expressionParsed = JsonSerializer.Deserialize<EmailSegmentExpression>(expression)
+            ?? throw new Exception("Could not parse expression to EmailSegmentExpression.");
+
+        EmailSegment newSegment = new() {
+            Tenant = userService.Tenant,
+            Name = name,
+            Expression = expression
+        };
+
+        emailConfiguration.Segments.Add(newSegment);
+        await db.SaveChangesAsync();
+
+        return db.EmailSegments.Where(p => p.Id == newSegment.Id);
     }
 
     [UseProjection]
