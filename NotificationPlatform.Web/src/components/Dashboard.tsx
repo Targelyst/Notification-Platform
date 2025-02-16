@@ -84,21 +84,24 @@ export default function Dashboard() {
 				</div>
 			</div>
 
+			{/* Updated content section with fade animation */}
 			<div className="flex-1 mx-2 my-3 p-4 relative">
-				<Routes>
-					{routes.map((route) => (
-						<Route key={route.path} path={route.path} element={route.component}>
-							{route.children?.map((child) => (
-								<Route
-									key={child.path}
-									path={child.path}
-									element={child.component}
-								/>
-							))}
-						</Route>
-					))}
-				</Routes>
-				<Footer />
+				<div key={location.key} className="animate-fadeIn">
+					<Routes>
+						{routes.map((route) => (
+							<Route key={route.path} path={route.path} element={route.component}>
+								{route.children?.map((child) => (
+									<Route
+										key={child.path}
+										path={child.path}
+										element={child.component}
+									/>
+								))}
+							</Route>
+						))}
+					</Routes>
+					<Footer />
+				</div>
 			</div>
 		</div>
 	);
