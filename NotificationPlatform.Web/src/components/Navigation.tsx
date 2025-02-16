@@ -7,8 +7,8 @@ import {
 	FiSettings,
 	FiLifeBuoy,
 	FiChevronDown,
-	FiUser,
 } from "react-icons/fi";
+import { GoProjectTemplate  } from "react-icons/go";
 import { routes } from "../routes";
 import { UserWidget } from "../components/UserWidget";
 import { useAvailableProjects, useCurrentProject } from "../api/projects";
@@ -66,8 +66,8 @@ const Sidebar = ({
 					onKeyDown={() => setIsUserMenuOpen(!isUserMenuOpen)}
 				>
 					<div className="flex items-center space-x-2">
-						<div className="bg-impolar-secondary p-1.5 rounded-lg">
-							<FiUser className="w-4 h-4 text-impolar-bg-highlight-text" />
+						<div className="bg-radial-[at_10%_40%] from-impolar-primary via-impolar-primary to-impolar-secondary to-90% p-1.5 rounded-lg">
+							<GoProjectTemplate className="w-4 h-4 text-impolar-primary-text" />
 						</div>
 						{currentProject ? (
 							<span className="font-medium text-impolar-bg-highlight-text text-sm">
@@ -78,7 +78,7 @@ const Sidebar = ({
 						)}
 					</div>
 					<FiChevronDown
-						className={`text-impolar-bg-surface-text transform transition-transform ${
+						className={`text-impolar-primary-text transform transition-transform ${
 							isUserMenuOpen ? "rotate-180" : ""
 						}`}
 						onClick={(e) => {

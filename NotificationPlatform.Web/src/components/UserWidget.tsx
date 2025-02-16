@@ -40,8 +40,8 @@ const Dropdown = ({ targetRef, isOpen, children }: DropdownProps) => {
 		<div
 			ref={dropdownRef}
 			className={`absolute ${position === "bottom" ? "mt-1" : "mb-1 bottom-full"} 
-        right-0 w-full min-w-[160px] bg-stone-600/30 backdrop-blur-sm rounded-md shadow-lg
-        border border-stone-500/30 z-50`}
+        left w-full min-w-[140px] bg-impolar-bg-surface rounded-lg shadow-lg
+        border  border-impolar-bg-highlight z-50`}
 		>
 			{children}
 		</div>
@@ -68,44 +68,44 @@ export const UserWidget = ({
 				type="button"
 				onClick={handleToggle}
 				className="flex items-center space-x-2 bg-impolar-bg-highlight group w-full p-2 rounded-lg 
-          transition-colors  hover:bg-stone-600/20 hover:text-stone-100 "
+          transition-colors  hover:bg-impolar-bg-highlight/95 hover:text-impolar-bg-highlight-text"
 			>
 				<div className="relative">
 					<div
-						className="w-7 h-7 rounded-full bg-stone-400/10 border border-stone-400/20 
-            flex items-center justify-center shadow-xs"
+						className="w-8 h-8 rounded-full bg-radial-[at_40%_40%] from-impolar-primary via-impolar-primary to-impolar-secondary to-90% 
+            flex items-center justify-center shadow-xs "
 					>
-						<FiUser className="w-3.5 h-3.5 " />
+						<FiUser className="w-3.5 h-3.5 text-impolar-bg-surface-text" />
 					</div>
 					<div
 						className="absolute bottom-0.5 right-0 w-2 h-2 rounded-full bg-green-400 
-            border border-stone-700/50"
+            border border-bg-impolar-bg-highlight/50"
 					/>
 				</div>
 				{showFull && (
 					<>
-						<span className="text-sm ">Artur OG</span>
+						<span className="text-sm text-impolar-bg-highlight-text">Artur OG</span>
 						<FiChevronDown
-							className={`transition-transform ${isMenuOpen ? "rotate-180" : ""}`}
+							className={`text-impolar-bg-highlight-text transition-transform ${isMenuOpen ? "rotate-180" : ""}`}
 						/>
 					</>
 				)}
 			</button>
 
 			<Dropdown targetRef={widgetRef} isOpen={isMenuOpen}>
-				<div className="p-1 space-y-0.5">
+				<div className="p-2 space-y-0.5 text-impolar-bg-surface-text">
 					<button
 						type="button"
-						className="w-full flex items-center p-1.5 rounded-md transition-colors 
-            text-sm  hover:bg-stone-500/20 hover:text-stone-100 space-x-2"
+						className="m-2 w-full flex items-center p-1.5 rounded-md transition-colors 
+            text-sm  hover:bg-impolar-bg-highlight/20 hover:text-impolar-bg-highlight-text space-x-2"
 					>
 						<FiSettings className="w-3.5 h-3.5 " />
-						<span>Account Settings</span>
+						<span>Settings</span>
 					</button>
 					<button
 						type="button"
-						className="w-full flex items-center p-1.5 rounded-md transition-colors 
-            text-sm  hover:bg-stone-500/20 hover:text-stone-100 space-x-2"
+						className=" m-2 w-full flex items-center p-1.5 rounded-md transition-colors 
+            text-sm  hover:bg-impolar-bg-highlight/20 hover:text-impolar-bg-highlight-text space-x-2"
 					>
 						<FiLogOut className="w-3.5 h-3.5 " />
 						<span>Log Out</span>

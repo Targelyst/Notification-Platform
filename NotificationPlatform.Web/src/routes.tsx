@@ -14,6 +14,7 @@ import {
 import type { ReactNode } from "react";
 import { Home } from "./pages/home/Home";
 import { UserPage } from "./pages/user/UserPage";
+import Segments from "./pages/audience/segments";
 
 export interface RouteConfig {
 	path: string;
@@ -82,7 +83,7 @@ export const routes: RouteConfig[] = [
 				path: "/audience/segments",
 				nameKey: "segments",
 				icon: <FiTag className="w-4 h-4" />,
-				component: <div>Segments</div>,
+				component: <Segments />,
 			},
 		],
 	},
