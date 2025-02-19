@@ -21,7 +21,8 @@ namespace NotificationPlatform.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    Tenant = table.Column<string>(type: "text", nullable: false)
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -34,7 +35,8 @@ namespace NotificationPlatform.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ProjectId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Tenant = table.Column<string>(type: "text", nullable: false)
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -57,7 +59,8 @@ namespace NotificationPlatform.Migrations
                     Show = table.Column<bool>(type: "boolean", nullable: false),
                     EmailConfigurationId = table.Column<Guid>(type: "uuid", nullable: false),
                     Choices = table.Column<string[]>(type: "text[]", nullable: true),
-                    Tenant = table.Column<string>(type: "text", nullable: false)
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -75,16 +78,62 @@ namespace NotificationPlatform.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     EmailAddress = table.Column<string>(type: "text", nullable: false),
                     EmailConfigurationId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Tenant = table.Column<string>(type: "text", nullable: false)
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EmailContacts", x => x.Id);
                     table.ForeignKey(
                         name: "FK_EmailContacts_EmailConfigurations_EmailConfigurationId",
+                        column: x => x.EmailConfigurationId,
+                        principalTable: "EmailConfigurations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmailSegments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    EmailConfigurationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Expression = table.Column<string>(type: "text", nullable: false),
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailSegments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EmailSegments_EmailConfigurations_EmailConfigurationId",
+                        column: x => x.EmailConfigurationId,
+                        principalTable: "EmailConfigurations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmailTransports",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Host = table.Column<string>(type: "text", nullable: false),
+                    Port = table.Column<int>(type: "integer", nullable: false),
+                    User = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<byte[]>(type: "bytea", nullable: false),
+                    EmailConfigurationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailTransports", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EmailTransports_EmailConfigurations_EmailConfigurationId",
                         column: x => x.EmailConfigurationId,
                         principalTable: "EmailConfigurations",
                         principalColumn: "Id",
@@ -102,7 +151,8 @@ namespace NotificationPlatform.Migrations
                     EmailContactDatePropertyValue_Value = table.Column<DateOnly>(type: "date", nullable: true),
                     Value = table.Column<double>(type: "double precision", nullable: true),
                     EmailContactStringPropertyValue_Value = table.Column<string>(type: "text", nullable: true),
-                    Tenant = table.Column<string>(type: "text", nullable: false)
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -117,6 +167,27 @@ namespace NotificationPlatform.Migrations
                         name: "FK_EmailContactPropertyValues_EmailContacts_ContactId",
                         column: x => x.ContactId,
                         principalTable: "EmailContacts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmailTransportSenderAddresses",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Address = table.Column<string>(type: "text", nullable: false),
+                    TransportId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailTransportSenderAddresses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EmailTransportSenderAddresses_EmailTransports_TransportId",
+                        column: x => x.TransportId,
+                        principalTable: "EmailTransports",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -147,6 +218,22 @@ namespace NotificationPlatform.Migrations
                 name: "IX_EmailContacts_EmailConfigurationId",
                 table: "EmailContacts",
                 column: "EmailConfigurationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailSegments_EmailConfigurationId",
+                table: "EmailSegments",
+                column: "EmailConfigurationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailTransports_EmailConfigurationId",
+                table: "EmailTransports",
+                column: "EmailConfigurationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailTransportSenderAddresses_TransportId_Address",
+                table: "EmailTransportSenderAddresses",
+                columns: new[] { "TransportId", "Address" },
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -156,10 +243,19 @@ namespace NotificationPlatform.Migrations
                 name: "EmailContactPropertyValues");
 
             migrationBuilder.DropTable(
+                name: "EmailSegments");
+
+            migrationBuilder.DropTable(
+                name: "EmailTransportSenderAddresses");
+
+            migrationBuilder.DropTable(
                 name: "EmailContactProperties");
 
             migrationBuilder.DropTable(
                 name: "EmailContacts");
+
+            migrationBuilder.DropTable(
+                name: "EmailTransports");
 
             migrationBuilder.DropTable(
                 name: "EmailConfigurations");

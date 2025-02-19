@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NotificationPlatform.Migrations
 {
     [DbContext(typeof(NotificationPlatformContext))]
-    [Migration("20250203115830_Initial")]
+    [Migration("20250216110905_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -32,6 +32,9 @@ namespace NotificationPlatform.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uuid");
@@ -81,6 +84,9 @@ namespace NotificationPlatform.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("EmailConfigurationId")
                         .HasColumnType("uuid");
 
@@ -120,6 +126,9 @@ namespace NotificationPlatform.Migrations
                     b.Property<Guid>("PropertyId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Tenant")
                         .IsRequired()
                         .HasColumnType("text");
@@ -138,11 +147,111 @@ namespace NotificationPlatform.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailSegment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EmailConfigurationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Expression")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Tenant")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmailConfigurationId");
+
+                    b.ToTable("EmailSegments");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailTransport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EmailConfigurationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Host")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("Password")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<int>("Port")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Tenant")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("User")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmailConfigurationId");
+
+                    b.ToTable("EmailTransports");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailTransportSenderAddress", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Tenant")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TransportId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TransportId", "Address")
+                        .IsUnique();
+
+                    b.ToTable("EmailTransportSenderAddresses");
+                });
+
             modelBuilder.Entity("NotificationPlatform.Models.Project", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -301,11 +410,48 @@ namespace NotificationPlatform.Migrations
                     b.Navigation("Property");
                 });
 
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailSegment", b =>
+                {
+                    b.HasOne("NotificationPlatform.Models.Email.EmailConfiguration", "EmailConfiguration")
+                        .WithMany("Segments")
+                        .HasForeignKey("EmailConfigurationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EmailConfiguration");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailTransport", b =>
+                {
+                    b.HasOne("NotificationPlatform.Models.Email.EmailConfiguration", "EmailConfiguration")
+                        .WithMany("Transports")
+                        .HasForeignKey("EmailConfigurationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EmailConfiguration");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailTransportSenderAddress", b =>
+                {
+                    b.HasOne("NotificationPlatform.Models.Email.EmailTransport", "Transport")
+                        .WithMany("SenderAddresses")
+                        .HasForeignKey("TransportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Transport");
+                });
+
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailConfiguration", b =>
                 {
                     b.Navigation("Contacts");
 
                     b.Navigation("Properties");
+
+                    b.Navigation("Segments");
+
+                    b.Navigation("Transports");
                 });
 
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContact", b =>
@@ -316,6 +462,11 @@ namespace NotificationPlatform.Migrations
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactProperty", b =>
                 {
                     b.Navigation("Values");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailTransport", b =>
+                {
+                    b.Navigation("SenderAddresses");
                 });
 
             modelBuilder.Entity("NotificationPlatform.Models.Project", b =>
