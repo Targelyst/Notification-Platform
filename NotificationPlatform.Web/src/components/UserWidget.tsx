@@ -6,6 +6,7 @@ interface UserWidgetProps {
 	toggleMenu: () => void;
 	menuRef: React.RefObject<HTMLDivElement>;
 	showFull: boolean;
+	className?: string;
 }
 
 interface DropdownProps {
@@ -53,6 +54,7 @@ export const UserWidget = ({
 	toggleMenu,
 	menuRef,
 	showFull,
+	className = ""
 }: UserWidgetProps) => {
 	const [localIsOpen, setLocalIsOpen] = useState(false);
 	const widgetRef = useRef<HTMLDivElement>(null);
@@ -63,7 +65,7 @@ export const UserWidget = ({
 	};
 
 	return (
-		<div className="relative" ref={menuRef}>
+		<div className={`relative ${className}`} ref={menuRef}>
 			<button
 				type="button"
 				onClick={handleToggle}

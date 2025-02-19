@@ -66,7 +66,7 @@ const Sidebar = ({
 					onKeyDown={() => setIsUserMenuOpen(!isUserMenuOpen)}
 				>
 					<div className="flex items-center space-x-2">
-						<div className="bg-radial-[at_10%_40%] from-impolar-primary via-impolar-primary to-impolar-secondary to-90% p-1.5 rounded-lg">
+						<div className="bg-gradient-to-r from-emerald-400 to-impolar-secondary transition-all p-1.5 rounded-lg">
 							<GoProjectTemplate className="w-4 h-4 text-impolar-primary-text" />
 						</div>
 						{currentProject ? (
@@ -262,7 +262,7 @@ export const Navigation = () => {
 		<>
 			<button
 				type="button"
-				className="md:hidden fixed bottom-5 right-5 p-3 bg-impolar-bg-surface backdrop-blur-xs rounded-full shadow-lg border border-impolar-bg-highlight hover:border-impolar-primary transition-all z-50"
+				className="lg:hidden fixed bottom-12 right-5 p-3 bg-impolar-bg-surface backdrop-blur-xs rounded-full shadow-lg border border-impolar-bg-highlight hover:border-impolar-primary transition-all z-50"
 				onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
 			>
 				{isMobileMenuOpen ? (
@@ -272,7 +272,7 @@ export const Navigation = () => {
 				)}
 			</button>
 
-			<div className="hidden md:block left-0 w-70 h-full max-h-22/23 bg-impolar-bg text-impolar-bg-surface-text z-40 p-4 m-3 mt-4">
+			<div className="hidden lg:block left-0 w-64 h-screen pb-6 max-h-22/23 bg-impolar-bg text-impolar-bg-surface-text z-40 p-4 m-3 mt-4">
 				<Sidebar
 					isMobile={false}
 					openSubmenus={openSubmenus}
@@ -284,13 +284,13 @@ export const Navigation = () => {
 
 			{isMobileMenuOpen && (
 				<div
-					className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden"
+					className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
 					onKeyDown={() => setIsMobileMenuOpen(false)}
 				/>
 			)}
 			<div
 				ref={sidebarRef}
-				className={`md:hidden fixed inset-y-0 left-0 transform ${
+				className={`lg:hidden fixed inset-y-0 left-0 transform ${
 					isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
 				} transition-transform duration-300 ease-out-expo w-64 bg-impolar-bg text-impolar-bg-surface-text flex flex-col z-50 p-4 pt-6 border-r border-impolar-bg-highlight`}
 			>

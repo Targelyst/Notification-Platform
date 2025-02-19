@@ -120,6 +120,7 @@ export const Home = () => {
           ))}
         </Area>
       ))}
+      
     </div>
   );
 };
