@@ -1,130 +1,8 @@
-import { FiExternalLink, FiUserPlus, FiMail, FiFileText, FiMap, FiClipboard, FiCheckCircle, FiArrowRight, FiSettings } from "react-icons/fi";
-
-const Card = ({
-  title,
-  desc,
-  icon,
-  status,
-  stats,
-  hoverText,
-  link
-}: {
-  title: string;
-  desc: string;
-  icon: React.ReactNode;
-  status: string;
-  progress?: number;
-  stats: string;
-  hoverText: string;
-  link: string;
-}) => {
-  return (
-    <a
-      href={link}
-      className="group relative bg-gradient-to-br from-impolar-bg-highlight to-impolar-bg rounded-xl p-5 border border-impolar-bg-highlight hover:border-impolar-bg-text transition-all duration-300 hover:shadow-impolar-bg/20"
-    >
-      <div className="flex justify-between items-start mb-4">
-        <StatusBadge status={status} />
-        {status === "completed" && (
-          <FiCheckCircle className="w-5 h-5 text-emerald-400/80" />
-        )}
-      </div>
-
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-impolar-bg-highlight rounded-lg shadow-sm">
-            {icon}
-          </div>
-          <h3 className="text-lg font-medium text-impolar-bg-text line-clamp-2">
-            {title}
-          </h3>
-        </div>
-        <p className="text-impolar-bg-text/80 text-sm leading-relaxed line-clamp-3">
-          {desc}
-        </p>
-        <div className="text-xs font-medium text-impolar-bg-text/60">
-          {stats}
-        </div>
-      </div>
+import { FiExternalLink, FiUserPlus, FiMail, FiFileText, FiMap, FiClipboard, FiSettings } from "react-icons/fi";
+import Area from "../../components/Area";
+import Card from "../../components/Card";
 
 
-      <div className="absolute inset-0 bg-impolar-bg/90 opacity-0 rounded-2xl group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center space-y-3 p-4 text-center">
-        <span className="text-impolar-bg-text font-medium text-sm">
-          {hoverText}
-        </span>
-        <div className="flex items-center gap-1.5 text-impolar-bg-text/80 group-hover:text-impolar-bg-text transition-colors">
-          <span className="text-xs">Quick action</span>
-          <FiArrowRight className="w-4 h-4" />
-        </div>
-      </div>
-    </a>
-  );
-};
-
-const Area = ({
-  title,
-  progress,
-  children,
-  link = "#"
-}: {
-  title: string;
-  progress: number;
-  children: React.ReactNode;
-  link?: string;
-}) => {
-  return (
-    <section className="bg-impolar-bg-surface rounded-2xl border border-impolar-bg-highlight p-6 shadow-xl hover:shadow-impolar-bg/30 transition-shadow">
-      <div className="flex justify-between items-center mb-6">
-        <div className="space-y-1">
-          <h2 className="text-xl font-semibold text-impolar-bg-text flex items-center gap-3">
-            {title}
-            <span className="text-xs font-medium px-2 py-1 bg-impolar-bg-highlight rounded-md text-impolar-bg-text">
-              {progress}% Complete
-            </span>
-          </h2>
-          <div className="w-48 h-1.5 bg-impolar-bg-highlight rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all duration-500"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
-        <a
-          href={link}
-          className="flex items-center gap-1 text-impolar-bg-text/80 hover:text-impolar-bg-text text-sm transition-colors"
-        >
-          View all resources
-          <FiArrowRight className="mt-0.5" />
-        </a>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {children}
-      </div>
-    </section>
-  );
-};
-
-const StatusBadge = ({ status }: { status: string }) => {
-  const statusConfig: { [key: string]: { color: string; text: string } } = {
-    completed: { color: "bg-emerald-500/20", text: "text-emerald-400" },
-    "in-progress": { color: "bg-amber-500/20", text: "text-amber-400" },
-    "attention-needed": { color: "bg-rose-500/20", text: "text-rose-400" },
-    new: { color: "bg-purple-500/20", text: "text-purple-400" },
-    updated: { color: "bg-sky-500/20", text: "text-sky-400" },
-    recommended: { color: "bg-cyan-500/20", text: "text-cyan-400" },
-  };
-
-  return (
-    <div
-      className={`px-2 py-1 rounded-md ${statusConfig[status].color} ${statusConfig[status].text} text-xs font-medium capitalize`}
-    >
-      {status.replace("-", " ")}
-    </div>
-  );
-};
-
-// Updated Home Component
 export const Home = () => {
   const sections = [
     {
@@ -197,8 +75,8 @@ export const Home = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-8">
-      <div className="flex justify-between items-center flex-wrap gap-4">
+    <div className="max-w-7xl mx-auto p-3 md:p-6 space-y-8">
+      <div className="flex justify-between items-center flex-wrap gap-4 p-1">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-impolar-bg-text">
             Welcome back, maaaaaaaa
@@ -207,15 +85,18 @@ export const Home = () => {
             Last login: 2 hours ago
           </p>
         </div>
-        <button
-          type="button"
-          className="flex items-center gap-2 bg-impolar-bg-surface hover:bg-impolar-bg-highlight border border-impolar-bg-highlight px-4 py-2.5 rounded-lg transition-all shrink-0"
-        >
-          <FiSettings className="text-impolar-bg-text" />
-          <span className="text-impolar-bg-text text-sm">
-            Workspace Settings
-          </span>
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            className="flex items-center gap-2 bg-impolar-bg-surface hover:bg-impolar-bg-highlight border border-impolar-bg-highlight px-4 py-2.5 rounded-lg transition-all shrink-0"
+          >
+            <FiSettings className="text-impolar-bg-text" />
+            <span className="text-impolar-bg-text text-sm">
+              Workspace Settings
+            </span>
+          </button>
+        </div>
+
       </div>
 
       {sections.map((section, sectionIdx) => (
@@ -242,3 +123,5 @@ export const Home = () => {
     </div>
   );
 };
+
+export default Home;

@@ -8,17 +8,18 @@ import { AuthGuard, AuthProvider } from "./components/AuthProvider";
 const App = () => {
 	return (
 		<AuthProvider>
-			<div className="relative h-screen flex bg-impolar-bg">
-				<ApiProvider>
-					<Router>
-						<div className="relative z-10 flex-1 flex">
-							<AuthGuard>
-								<Navigation />
-								<Dashboard />
-							</AuthGuard>
-						</div>
-					</Router>
-				</ApiProvider>
+			<div className="h-full bg-impolar-bg">
+				<div className="relative flex ">
+					<ApiProvider>
+						<Router>
+							<div className="relative z-10 flex-1 flex">
+								<AuthGuard>
+									<Dashboard />
+								</AuthGuard>
+							</div>
+						</Router>
+					</ApiProvider>
+				</div>
 			</div>
 		</AuthProvider>
 	);

@@ -1,5 +1,5 @@
 // components/SimpleEmailBuilder/TextComponent.tsx
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useDraggableBlock } from "../hooks";
 import { Block, BlockType } from "../types";
 import ContextMenu from "../ContextMenu";

@@ -9,7 +9,7 @@ import {
 	FiChevronDown,
 } from "react-icons/fi";
 import { GoProjectTemplate  } from "react-icons/go";
-import { routes } from "../routes";
+import { NavigationRoutes } from "../NavigationRoutes";
 import { UserWidget } from "../components/UserWidget";
 import { useAvailableProjects, useCurrentProject } from "../api/projects";
 
@@ -121,7 +121,7 @@ const Sidebar = ({
 
 			{/* Navigation Routes - maintaining existing structure */}
 			<div className="space-y-1 flex-1 overflow-auto">
-				{routes.map((route) => (
+				{NavigationRoutes.map((route) => (
 					<div key={route.path}>
 						<div
 							className={`w-full flex items-center justify-between p-2 rounded-lg transition-all duration-200 group ${
@@ -133,7 +133,7 @@ const Sidebar = ({
 							<NavLink
 								to={route.path}
 								className="flex-1 flex items-center space-x-2"
-								onClick={() => route.component && navigate(route.path)}
+								onClick={() => navigate(route.path)}
 							>
 								{route.icon}
 								<span className="group-hover:text-impolar-bg-surface-text transition-colors text-sm">
@@ -262,7 +262,7 @@ export const Navigation = () => {
 		<>
 			<button
 				type="button"
-				className="md:hidden fixed bottom-5 right-5 p-3 bg-impolar-bg-surface backdrop-blur-xl rounded-full shadow-lg border border-impolar-bg-highlight hover:border-impolar-primary transition-all z-50"
+				className="md:hidden fixed bottom-5 right-5 p-3 bg-impolar-bg-surface backdrop-blur-xs rounded-full shadow-lg border border-impolar-bg-highlight hover:border-impolar-primary transition-all z-50"
 				onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
 			>
 				{isMobileMenuOpen ? (
@@ -272,7 +272,7 @@ export const Navigation = () => {
 				)}
 			</button>
 
-			<div className="hidden md:block left-0 w-70 bg-impolar-bg text-impolar-bg-surface-text z-40 p-4 m-3 mt-4">
+			<div className="hidden md:block left-0 w-70 h-full max-h-22/23 bg-impolar-bg text-impolar-bg-surface-text z-40 p-4 m-3 mt-4">
 				<Sidebar
 					isMobile={false}
 					openSubmenus={openSubmenus}
@@ -292,7 +292,7 @@ export const Navigation = () => {
 				ref={sidebarRef}
 				className={`md:hidden fixed inset-y-0 left-0 transform ${
 					isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-				} transition-transform duration-300 ease-out-expo w-64 bg-impolar-bg flex flex-col z-50 p-4 pt-6 border-r border-impolar-bg-highlight`}
+				} transition-transform duration-300 ease-out-expo w-64 bg-impolar-bg text-impolar-bg-surface-text flex flex-col z-50 p-4 pt-6 border-r border-impolar-bg-highlight`}
 			>
 				<Sidebar
 					isMobile={true}

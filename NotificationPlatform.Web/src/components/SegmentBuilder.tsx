@@ -139,22 +139,34 @@ const FilterBlock = ({
     );
 };
 
-export const SegmentBuilder = () => {
+interface SegmentBuilderProps {
+    initialQuery?: string;
+    onSave: (query: string) => void;
+    onClose: () => void;
+}
+
+const initialBlock = {
+    id: 1,
+    logic: "and" as "and" | "or",
+    state: {
+        variable: "",
+        operator: "",
+        inputValue: "",
+        rangeValues: { min: "", max: "" },
+        timeUnit: "days"
+    }
+};
+
+export const SegmentBuilder = ({ initialQuery, onSave, onClose }: SegmentBuilderProps) => {
     const [blocks, setBlocks] = useState<{
         id: number;
         logic: "and" | "or";
         state: FilterBlockState;
-    }[]>([{
-        id: 1,
-        logic: "and",
-        state: {
-            variable: "",
-            operator: "",
-            inputValue: "",
-            rangeValues: { min: "", max: "" },
-            timeUnit: "days"
-        }
-    }]);
+    }[]>(() => {
+        if (!initialQuery) return [initialBlock];
+        // Add query parsing logic here if needed
+        return [initialBlock];
+    });
 
     const addBlock = () => {
         setBlocks([...blocks, {
@@ -223,13 +235,21 @@ export const SegmentBuilder = () => {
         });
 
         const query = queryParts.filter(p => p).join(" ");
-        console.log(query);
-        return query;
+        onSave(query);
     };
 
     return (
         <section className="bg-impolar-bg-surface rounded-2xl border border-impolar-bg-highlight p-4 shadow-xl">
-            <h2 className="text-lg font-semibold text-impolar-bg-text mb-4">Segment Builder</h2>
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-impolar-bg-text">Segment Builder</h2>
+                <button 
+                    onClick={onClose} 
+                    className="text-impolar-bg-text/60 hover:text-impolar-bg-text"
+                >
+                    <FiX className="w-5 h-5" />
+                </button>
+            </div>
+            
             <div className="space-y-3">
                 {blocks.map((block, index) => (
                     <div key={block.id}>
@@ -268,7 +288,7 @@ export const SegmentBuilder = () => {
                 ))}
             </div>
 
-            <div className="mt-4 flex justify-end">
+            <div className="mt-4 flex justify-end gap-2">
                 <Button
                     buttonType="secondary"
                     onClick={addBlock}
@@ -278,8 +298,18 @@ export const SegmentBuilder = () => {
                         Add Filter Condition
                     </div>
                 </Button>
+            </div>
 
-                <Button onClick={handleSave}>Save Segment</Button>
+            <div className="mt-6 flex justify-end gap-2">
+                <Button 
+                    buttonType="secondary" 
+                    onClick={onClose}
+                >
+                    Cancel
+                </Button>
+                <Button onClick={handleSave}>
+                    {initialQuery ? 'Update Segment' : 'Save Segment'}
+                </Button>
             </div>
         </section>
     );
