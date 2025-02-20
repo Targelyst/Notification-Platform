@@ -69,7 +69,7 @@ export const UserWidget = ({
 			<button
 				type="button"
 				onClick={handleToggle}
-				className="flex items-center space-x-2 bg-impolar-bg-highlight group w-full p-2 rounded-lg 
+				className="flex items-center space-x-2  group w-full p-2 rounded-lg 
           transition-colors  hover:bg-impolar-bg-highlight/95 hover:text-impolar-bg-highlight-text"
 			>
 				<div className="relative">

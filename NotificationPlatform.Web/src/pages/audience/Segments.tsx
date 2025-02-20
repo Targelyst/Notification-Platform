@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { SegmentBuilder } from '../../components/SegmentBuilder';
 import SegmentList, { Segment } from '../../components/SegmentList';
 import { RightSidebar } from '../../components/RightSidebar';
+import BasicLayout from '../../BasicLayot';
+import Area from '../../components/Area';
 
 const initialSegments: Segment[] = [
     {
@@ -23,7 +25,7 @@ export default function Segments() {
 
     const handleSaveSegment = (newSegment: Omit<Segment, 'id' | 'createdAt' | 'lastRun' | 'openRate' | 'clickRate'>) => {
         if (editedSegment) {
-            const updated = segments.map(s => 
+            const updated = segments.map(s =>
                 s.id === editedSegment.id ? { ...s, ...newSegment } : s
             );
             setSegments(updated);
@@ -58,33 +60,37 @@ export default function Segments() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto p-6 space-y-8">
-            <div className="flex gap-8">
-                <SegmentList 
-                    segments={segments}
-                    onEdit={handleEdit}
-                    onDuplicate={handleDuplicate}
-                    onDelete={handleDelete}
-                />
-                
-                {isSidebarOpen && (
-                    <RightSidebar
-                    width={400}
-                        title={isDuplicating ? 'Duplicate Segment' : 'Edit Segment'}
-                        onClose={() => setIsSidebarOpen(false)}
-                    >
-                        <SegmentBuilder 
-                            initialQuery={editedSegment?.query}
-                            onSave={(query) => handleSaveSegment({
-                                ...editedSegment!,
-                                SegmentName: editedSegment!.SegmentName,
-                                query
-                            })}
+
+        <BasicLayout title='Contacts' description='Manage your audienceManage your audience'>
+            <div><Area title='asd'>
+                <div className="flex gap-8">
+                    <SegmentList
+                        segments={segments}
+                        onEdit={handleEdit}
+                        onDuplicate={handleDuplicate}
+                        onDelete={handleDelete}
+                    />
+
+                    {isSidebarOpen && (
+                        <RightSidebar
+                            width={400}
+                            title={isDuplicating ? 'Duplicate Segment' : 'Edit Segment'}
                             onClose={() => setIsSidebarOpen(false)}
-                        />
-                    </RightSidebar>
-                )}
+                        >
+                            <SegmentBuilder
+                                initialQuery={editedSegment?.query}
+                                onSave={(query) => handleSaveSegment({
+                                    ...editedSegment!,
+                                    SegmentName: editedSegment!.SegmentName,
+                                    query
+                                })}
+                                onClose={() => setIsSidebarOpen(false)}
+                            />
+                        </RightSidebar>
+                    )}
+                </div></Area>
             </div>
-        </div>
+        </BasicLayout>
+
     );
 }

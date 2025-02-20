@@ -11,9 +11,12 @@ import {
 	FiUsers,
 	FiUser,
 } from "react-icons/fi";
+
+import {TbHomeFilled, TbBrandGoogleAnalytics } from "react-icons/tb";
+import { } from "react-icons/io";
 import type { ReactNode } from "react";
 
-import { PageUrls } from "./PageURLs"; 
+import { RoutesAndUrls } from "./RoutesAndUrls"; 
 
 export interface NavigationRouteConfig {
 	path: string;
@@ -24,79 +27,79 @@ export interface NavigationRouteConfig {
 
 export const NavigationRoutes: NavigationRouteConfig[] = [
     {
-        path: PageUrls.HOME.urlPath,
-        nameKey: PageUrls.HOME.pageName,
-        icon: <FiHome className="w-5 h-5" />,
+        path: RoutesAndUrls.HOME.urlPath,
+        nameKey: RoutesAndUrls.HOME.pageName,
+        icon: <TbHomeFilled className="w-5 h-5" />,
     },
     {
-        path: PageUrls.ANALYTICS.urlPath,
-        nameKey: PageUrls.ANALYTICS.pageName,
-        icon: <FiActivity className="w-5 h-5" />,
+        path: RoutesAndUrls.ANALYTICS.urlPath,
+        nameKey: RoutesAndUrls.ANALYTICS.pageName,
+        icon: <TbBrandGoogleAnalytics  className="w-5 h-5" />,
     },
     {
-        path: PageUrls.CONTENT.urlPath,
-        nameKey: PageUrls.CONTENT.pageName,
+        path: RoutesAndUrls.CONTENT.urlPath,
+        nameKey: RoutesAndUrls.CONTENT.pageName,
         icon: <FiFile className="w-5 h-5" />,
         children: [
             {
-                path: PageUrls.CONTENT_TEMPLATES.urlPath,
-                nameKey: PageUrls.CONTENT_TEMPLATES.pageName,
+                path: RoutesAndUrls.CONTENT_TEMPLATES.urlPath,
+                nameKey: RoutesAndUrls.CONTENT_TEMPLATES.pageName,
                 icon: <FiLayout className="w-4 h-4" />,
             },
             {
-                path: PageUrls.CONTENT_SIGNUP_FORM.urlPath,
-                nameKey: PageUrls.CONTENT_SIGNUP_FORM.pageName,
+                path: RoutesAndUrls.CONTENT_SIGNUP_FORM.urlPath,
+                nameKey: RoutesAndUrls.CONTENT_SIGNUP_FORM.pageName,
                 icon: <FiEdit className="w-4 h-4" />,
             },
         ],
     },
     {
-        path: PageUrls.AUDIENCE.urlPath,
-        nameKey: PageUrls.AUDIENCE.pageName,
+        path: RoutesAndUrls.AUDIENCE.urlPath,
+        nameKey: RoutesAndUrls.AUDIENCE.pageName,
         icon: <FiUsers className="w-5 h-5" />,
         children: [
             {
-                path: PageUrls.AUDIENCE_CONTACTS.urlPath,
-                nameKey: PageUrls.AUDIENCE_CONTACTS.pageName,
+                path: RoutesAndUrls.AUDIENCE_CONTACTS.urlPath,
+                nameKey: RoutesAndUrls.AUDIENCE_CONTACTS.pageName,
                 icon: <FiUsers className="w-4 h-4" />,
             },
             {
-                path: PageUrls.AUDIENCE_INBOX.urlPath,
-                nameKey: PageUrls.AUDIENCE_INBOX.pageName,
+                path: RoutesAndUrls.AUDIENCE_INBOX.urlPath,
+                nameKey: RoutesAndUrls.AUDIENCE_INBOX.pageName,
                 icon: <FiInbox className="w-4 h-4" />,
             },
             {
-                path: PageUrls.AUDIENCE_SEGMENTS.urlPath,
-                nameKey: PageUrls.AUDIENCE_SEGMENTS.pageName,
+                path: RoutesAndUrls.AUDIENCE_SEGMENTS.urlPath,
+                nameKey: RoutesAndUrls.AUDIENCE_SEGMENTS.pageName,
                 icon: <FiTag className="w-4 h-4" />,
             },
         ],
     },
     {
-        path: PageUrls.CAMPAIGNS.urlPath,
-        nameKey: PageUrls.CAMPAIGNS.pageName,
+        path: RoutesAndUrls.CAMPAIGNS.urlPath,
+        nameKey: RoutesAndUrls.CAMPAIGNS.pageName,
         icon: <FiSend className="w-5 h-5" />,
     },
     {
-        path: PageUrls.AUTOMATIONS.urlPath,
-        nameKey: PageUrls.AUTOMATIONS.pageName,
+        path: RoutesAndUrls.AUTOMATIONS.urlPath,
+        nameKey: RoutesAndUrls.AUTOMATIONS.pageName,
         icon: <FiRepeat className="w-5 h-5" />,
         children: [
             {
-                path: PageUrls.AUTOMATIONS_OVERVIEW.urlPath,
-                nameKey: PageUrls.AUTOMATIONS_OVERVIEW.pageName,
+                path: RoutesAndUrls.AUTOMATIONS_OVERVIEW.urlPath,
+                nameKey: RoutesAndUrls.AUTOMATIONS_OVERVIEW.pageName,
                 icon: <FiActivity className="w-4 h-4" />,
             },
             {
-                path: PageUrls.AUTOMATIONS_EMAIL_JOURNEYS.urlPath,
-                nameKey: PageUrls.AUTOMATIONS_EMAIL_JOURNEYS.pageName,
+                path: RoutesAndUrls.AUTOMATIONS_EMAIL_JOURNEYS.urlPath,
+                nameKey: RoutesAndUrls.AUTOMATIONS_EMAIL_JOURNEYS.pageName,
                 icon: <FiRepeat className="w-4 h-4" />,
             },
         ],
     },
     {
-        path: PageUrls.USER.urlPath,
-        nameKey: PageUrls.USER.pageName,
+        path: RoutesAndUrls.USER.urlPath,
+        nameKey: RoutesAndUrls.USER.pageName,
         icon: <FiUser className="w-5 h-5" />,
     },
 ];

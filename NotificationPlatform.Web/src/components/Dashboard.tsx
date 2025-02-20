@@ -3,22 +3,23 @@ import { Route, Routes, useLocation, Link, useNavigate } from "react-router-dom"
 import { FiChevronLeft } from "react-icons/fi";
 import { UserWidget } from "./UserWidget";
 import { Footer } from "./Footer";
-import pageUrlsArray from "../PageURLs";
+import pageUrlsArray from "../RoutesAndUrls";
 import { Navigation } from "./Navigation";
 
-const Breadcrumb = ({ pathSegments, navigate }: {
+const Breadcrumb = ({
+	pathSegments,
+	onChevronClick
+}: {
 	pathSegments: string[];
 	navigate: (path: string) => void;
+	onChevronClick: () => void;
 }) => {
-	const parentPath = pathSegments.length > 0
-		? `/${pathSegments.slice(0, -1).join("/")}`
-		: "/";
 
 	return (
-		<div className="flex items-center gap-2 max-w-96 overflow-auto">
+		<div className="flex items-center gap-2 max-w-64 md:max-w-96 overflow-auto md:overflow-visible">
 			{pathSegments.length > 0 && (
 				<button
-					onClick={() => navigate(parentPath === '/' ? '/home' : parentPath)}
+					onClick={onChevronClick}
 					className="text-impolar-bg-text hover:text-impolar-bg-highlight-text"
 				>
 					<FiChevronLeft />
@@ -49,6 +50,7 @@ export default function Dashboard() {
 	const navigate = useNavigate();
 	const pathSegments = location.pathname.split("/").filter((p) => p !== "");
 	const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 	const userMenuRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -65,14 +67,19 @@ export default function Dashboard() {
 	return (
 		<div className="w-full flex flex-col h-screen">
 			<div className="flex flex-1 overflow-hidden">
-				<Navigation />
+				<Navigation
+					isMobileMenuOpen={isMobileMenuOpen}
+					setIsMobileMenuOpen={setIsMobileMenuOpen}
+				/>
 
-				{/* Main content area */}
 				<div className="flex flex-col flex-1 lg:mt-4 lg:mb-4 lg:mr-4 overflow-y-auto">
 					<div className="bg-gradient-to-br from-impolar-bg-surface/90 via-impolar-bg-surface/20 to-impolar-bg-highlight/50 rounded-b-lg lg:rounded-2xl border-impolar-bg-highlight/30 border">
-						{/* Sticky header */}
 						<div className="flex items-center justify-between p-3 border-b-2 border-impolar-bg-highlight/30 sticky top-0 z-10  backdrop-blur-sm rounded-t-2xl mt-0.5 ">
-							<Breadcrumb pathSegments={pathSegments} navigate={navigate} />
+							<Breadcrumb
+								pathSegments={pathSegments}
+								navigate={navigate}
+								onChevronClick={() => { setIsMobileMenuOpen(!isMobileMenuOpen); console.log("log") }}
+							/>
 
 							<div className="flex items-center gap-2">
 								<UserWidget
@@ -92,7 +99,6 @@ export default function Dashboard() {
 							</div>
 						</div>
 
-						{/* Scrollable content */}
 						<main className="md:p-2 mb-22 mt-4 min-h-[calc(100vh-260px)]">
 							<div key={location.key} className="animate-fadeIn">
 								<Routes>
@@ -104,7 +110,6 @@ export default function Dashboard() {
 						</main>
 					</div>
 
-					{/* Footer now appears after scrolling past content */}
 					<Footer />
 				</div>
 			</div>

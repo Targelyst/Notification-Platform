@@ -14,7 +14,6 @@ const Card = ({
   desc: string;
   icon: React.ReactNode;
   status: string;
-  progress?: number;
   stats: string;
   hoverText: string;
   link: string;

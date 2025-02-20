@@ -1,6 +1,7 @@
 import { FiExternalLink, FiUserPlus, FiMail, FiFileText, FiMap, FiClipboard, FiSettings } from "react-icons/fi";
 import Area from "../../components/Area";
 import Card from "../../components/Card";
+import BasicLayout from "../../BasicLayot";
 
 
 export const Home = () => {
@@ -8,6 +9,7 @@ export const Home = () => {
     {
       title: "Get Started",
       progress: 40,
+      link: "/getting-started",
       cards: [
         {
           title: "Explore Impolar Platform",
@@ -42,6 +44,7 @@ export const Home = () => {
     {
       title: "Content Creation",
       progress: 75,
+      link: "/content",
       cards: [
         {
           title: "Template Designer",
@@ -75,35 +78,15 @@ export const Home = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto p-3 md:p-6 space-y-8">
-      <div className="flex justify-between items-center flex-wrap gap-4 p-1">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-impolar-bg-text">
-            Welcome back, maaaaaaaa
-          </h1>
-          <p className="text-impolar-bg-text/80 mt-1 text-sm md:text-base">
-            Last login: 2 hours ago
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            className="flex items-center gap-2 bg-impolar-bg-surface hover:bg-impolar-bg-highlight border border-impolar-bg-highlight px-4 py-2.5 rounded-lg transition-all shrink-0"
-          >
-            <FiSettings className="text-impolar-bg-text" />
-            <span className="text-impolar-bg-text text-sm">
-              Workspace Settings
-            </span>
-          </button>
-        </div>
+    <BasicLayout title="Welcome back, maaaaaaaa" description="Here's what's happening in your workspace " toolbar={<button type="button" className="flex items-center gap-2 bg-impolar-bg-surface hover:bg-impolar-bg-highlight border border-impolar-bg-highlight px-4 py-2.5 rounded-lg transition-all shrink-0" > <FiSettings className="text-impolar-bg-text" /> <span className="text-impolar-bg-text text-sm"> Workspace Settings </span> </button>}>
 
-      </div>
 
       {sections.map((section, sectionIdx) => (
         <Area
           key={sectionIdx}
           title={section.title}
           progress={section.progress}
+          link={section.link}
         >
           {section.cards.map((card, cardIdx) => (
             <Card
@@ -112,7 +95,6 @@ export const Home = () => {
               desc={card.desc}
               icon={card.icon}
               status={card.status}
-              progress={card.progress}
               stats={card.stats}
               hoverText={card.hoverText}
               link={card.link}
@@ -121,7 +103,7 @@ export const Home = () => {
         </Area>
       ))}
       
-    </div>
+    </BasicLayout>
   );
 };
 

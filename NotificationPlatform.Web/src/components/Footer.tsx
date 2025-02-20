@@ -1,27 +1,54 @@
-//TODO: Social Links, Translations, move links to PageUrls
-import { FaTwitter, FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
+//TODO: Maybe move the social links to a separate component
+// Translations
+import { FaTwitter, FaGithub, FaLinkedin, FaEnvelope, FaFacebook, FaInstagram, FaSlack, FaDiscord, FaYoutube } from 'react-icons/fa';
+import { RoutesAndUrls } from '../RoutesAndUrls';
 
 export function Footer() {
   const socialLinks = [
     {
-      name: 'Twitter',
+      name: RoutesAndUrls.TWITTER.pageName,
       icon: <FaTwitter className="h-5 w-5" />,
-      href: '#',
+      href: RoutesAndUrls.TWITTER.urlPath,
     },
     {
-      name: 'GitHub',
+      name: RoutesAndUrls.GITHUB.pageName,
       icon: <FaGithub className="h-5 w-5" />,
-      href: '#',
+      href: RoutesAndUrls.GITHUB.urlPath,
     },
     {
-      name: 'LinkedIn',
+      name: RoutesAndUrls.LINKEDIN.pageName,
       icon: <FaLinkedin className="h-5 w-5" />,
-      href: '#',
+      href: RoutesAndUrls.LINKEDIN.urlPath,
     },
     {
-      name: 'Email',
+      name: RoutesAndUrls.EMAIL.pageName,
       icon: <FaEnvelope className="h-5 w-5" />,
-      href: '#',
+      href: RoutesAndUrls.EMAIL.urlPath,
+    },
+    {
+      name: RoutesAndUrls.FACEBOOK.pageName,
+      icon: <FaFacebook className="h-5 w-5" />,
+      href: RoutesAndUrls.FACEBOOK.urlPath,
+    },
+    {
+      name: RoutesAndUrls.INSTAGRAM.pageName,
+      icon: <FaInstagram className="h-5 w-5" />,
+      href: RoutesAndUrls.INSTAGRAM.urlPath,
+    },
+    {
+      name: RoutesAndUrls.SLACK.pageName,
+      icon: <FaSlack className="h-5 w-5" />,
+      href: RoutesAndUrls.SLACK.urlPath,
+    },
+    {
+      name: RoutesAndUrls.DISCORD.pageName,
+      icon: <FaDiscord className="h-5 w-5" />,
+      href: RoutesAndUrls.DISCORD.urlPath,
+    },
+    {
+      name: RoutesAndUrls.YOUTUBE.pageName,
+      icon: <FaYoutube className="h-5 w-5" />,
+      href: RoutesAndUrls.YOUTUBE.urlPath,
     },
   ];
 
@@ -29,7 +56,7 @@ export function Footer() {
     <footer className="bg-impolar-bg text-impolar-bg-text">
       <div className="mx-auto max-w-7xl px-6 pt-12 pb-8 sm:px-6 ">
         {/* Newsletter Section */}
-        <div className="mb-16 flex flex-col justify-between gap-8 md:flex-row">
+        <div className="mb-16 flex flex-col justify-between gap-8 md:flex-row border-b border-impolar-bg-highlight pb-4">
           <div className="max-w-md space-y-4 ">
             <h2 className="text-2xl font-bold text-impolar-bg-text">
               Sign up to our newsletter
@@ -73,13 +100,13 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="text-sm font-semibold text-impolar-primary-text">Solutions</h4>
             <nav className="mt-4 space-y-2">
-              {['Product', 'Features', 'Pricing', 'Demo'].map((item) => (
+              {[RoutesAndUrls.PRODUCT, RoutesAndUrls.FEATURES, RoutesAndUrls.PRICING, RoutesAndUrls.DEMO].map((item) => (
                 <a
-                  key={item}
-                  href="#"
+                  key={item.pageName}
+                  href={item.urlPath}
                   className="block text-sm text-impolar-bg-text hover:text-impolar-secondary-text"
                 >
-                  {item}
+                  {item.pageName}
                 </a>
               ))}
             </nav>
@@ -90,13 +117,13 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="text-sm font-semibold text-impolar-primary-text">Company</h4>
             <nav className="mt-4 space-y-2">
-              {['About', 'Blog', 'Careers', 'Contact'].map((item) => (
+              {[RoutesAndUrls.ABOUT, RoutesAndUrls.BLOG, RoutesAndUrls.CAREERS, RoutesAndUrls.CONTACT].map((item) => (
                 <a
-                  key={item}
-                  href="#"
+                  key={item.pageName}
+                  href={item.urlPath}
                   className="block text-sm text-impolar-bg-text hover:text-impolar-secondary-text"
                 >
-                  {item}
+                  {item.pageName}
                 </a>
               ))}
             </nav>
@@ -106,13 +133,13 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="text-sm font-semibold text-impolar-primary-text">Legal</h4>
             <nav className="mt-4 space-y-2">
-              {['Privacy', 'Terms', 'Security', 'Cookie Policy'].map((item) => (
+              {[RoutesAndUrls.PRIVACY, RoutesAndUrls.TERMS, RoutesAndUrls.SECURITY, RoutesAndUrls.COOKIE_POLICY].map((item) => (
                 <a
-                  key={item}
-                  href="#"
+                  key={item.pageName}
+                  href={item.urlPath}
                   className="block text-sm text-impolar-bg-text hover:text-impolar-secondary-text"
                 >
-                  {item}
+                  {item.pageName}
                 </a>
               ))}
             </nav>
@@ -121,13 +148,13 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="text-sm font-semibold text-impolar-primary-text">Resources</h4>
             <nav className="mt-4 space-y-2">
-              {['Documentation', 'Help Center', 'API Status', 'Guides'].map((item) => (
+              {[RoutesAndUrls.DOCUMENTATION, RoutesAndUrls.HELP_CENTER, RoutesAndUrls.API_STATUS, RoutesAndUrls.GUIDES].map((item) => (
                 <a
-                  key={item}
-                  href="#"
+                  key={item.pageName}
+                  href={item.urlPath}
                   className="block text-sm text-impolar-bg-text hover:text-impolar-secondary-text"
                 >
-                  {item}
+                  {item.pageName}
                 </a>
               ))}
             </nav>
