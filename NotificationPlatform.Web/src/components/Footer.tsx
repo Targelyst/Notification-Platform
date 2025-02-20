@@ -2,8 +2,17 @@
 // Translations
 import { FaTwitter, FaGithub, FaLinkedin, FaEnvelope, FaFacebook, FaInstagram, FaSlack, FaDiscord, FaYoutube } from 'react-icons/fa';
 import { RoutesAndUrls } from '../RoutesAndUrls';
+import * as CookieConsent from "vanilla-cookieconsent";
+import { useEffect } from 'react';
+import pluginConfig from '../CookieConsentConfig';
+import { BiCookie } from 'react-icons/bi';
+import "vanilla-cookieconsent/dist/cookieconsent.css";
 
 export function Footer() {
+
+  useEffect(() => {
+    CookieConsent.run(pluginConfig);
+  }, []);
   const socialLinks = [
     {
       name: RoutesAndUrls.TWITTER.pageName,
@@ -93,7 +102,14 @@ export function Footer() {
             <p className="text-sm text-impolar-bg-text">
               Building the future of digital experiences
             </p>
-
+            {/* Add Cookie Icon */}
+            <button
+              onClick={() => CookieConsent.showPreferences()}
+              className="text-impolar-bg-text hover:text-impolar-primary transition-colors"
+              aria-label="Cookie preferences"
+            >
+              <BiCookie className="h-6 w-6" />
+            </button>
           </div>
 
           {/* Solutions */}
