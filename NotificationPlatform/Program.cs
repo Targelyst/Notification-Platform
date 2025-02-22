@@ -34,6 +34,10 @@ builder.Services.AddDbContextFactory<NotificationPlatformContext>(opt => {
             opt.MapEnum<EmailContactPropertyType>();
         }
     );
+
+    if (builder.Environment.IsDevelopment()) {
+        opt.EnableSensitiveDataLogging();
+    }
 });
 
 builder.Services
@@ -101,10 +105,6 @@ builder.Services
     .AddType<EmailContactNumberProperty>()
     .AddType<EmailContactDateProperty>()
     .AddType<EmailContactChoiceProperty>()
-    .AddType<EmailContactStringPropertyValue>()
-    .AddType<EmailContactNumberPropertyValue>()
-    .AddType<EmailContactDatePropertyValue>()
-    .AddType<EmailContactChoicePropertyValue>()
     .ModifyRequestOptions(
         opt => opt.IncludeExceptionDetails = builder.Environment.IsDevelopment()
     )

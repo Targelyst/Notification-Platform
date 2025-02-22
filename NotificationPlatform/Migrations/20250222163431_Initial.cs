@@ -146,11 +146,7 @@ namespace NotificationPlatform.Migrations
                 {
                     ContactId = table.Column<Guid>(type: "uuid", nullable: false),
                     PropertyId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Type = table.Column<EmailContactPropertyType>(type: "email_contact_property_type", nullable: false),
-                    EmailContactChoicePropertyValue_Value = table.Column<string>(type: "text", nullable: true),
-                    EmailContactDatePropertyValue_Value = table.Column<DateOnly>(type: "date", nullable: true),
-                    Value = table.Column<double>(type: "double precision", nullable: true),
-                    EmailContactStringPropertyValue_Value = table.Column<string>(type: "text", nullable: true),
+                    Value = table.Column<string>(type: "text", nullable: false),
                     Tenant = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },

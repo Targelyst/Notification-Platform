@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NotificationPlatform.Migrations
 {
     [DbContext(typeof(NotificationPlatformContext))]
-    [Migration("20250216110905_Initial")]
+    [Migration("20250222163431_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -133,18 +133,15 @@ namespace NotificationPlatform.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<EmailContactPropertyType>("Type")
-                        .HasColumnType("email_contact_property_type");
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("ContactId", "PropertyId");
 
                     b.HasIndex("PropertyId");
 
                     b.ToTable("EmailContactPropertyValues");
-
-                    b.HasDiscriminator<EmailContactPropertyType>("Type");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailSegment", b =>
@@ -294,66 +291,6 @@ namespace NotificationPlatform.Migrations
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactStringProperty", b =>
                 {
                     b.HasBaseType("NotificationPlatform.Models.Email.EmailContactProperty");
-
-                    b.HasDiscriminator().HasValue(EmailContactPropertyType.String);
-                });
-
-            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactChoicePropertyValue", b =>
-                {
-                    b.HasBaseType("NotificationPlatform.Models.Email.EmailContactPropertyValue");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.ToTable("EmailContactPropertyValues", t =>
-                        {
-                            t.Property("Value")
-                                .HasColumnName("EmailContactChoicePropertyValue_Value");
-                        });
-
-                    b.HasDiscriminator().HasValue(EmailContactPropertyType.Choice);
-                });
-
-            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactDatePropertyValue", b =>
-                {
-                    b.HasBaseType("NotificationPlatform.Models.Email.EmailContactPropertyValue");
-
-                    b.Property<DateOnly>("Value")
-                        .HasColumnType("date");
-
-                    b.ToTable("EmailContactPropertyValues", t =>
-                        {
-                            t.Property("Value")
-                                .HasColumnName("EmailContactDatePropertyValue_Value");
-                        });
-
-                    b.HasDiscriminator().HasValue(EmailContactPropertyType.Date);
-                });
-
-            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactNumberPropertyValue", b =>
-                {
-                    b.HasBaseType("NotificationPlatform.Models.Email.EmailContactPropertyValue");
-
-                    b.Property<double>("Value")
-                        .HasColumnType("double precision");
-
-                    b.HasDiscriminator().HasValue(EmailContactPropertyType.Number);
-                });
-
-            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactStringPropertyValue", b =>
-                {
-                    b.HasBaseType("NotificationPlatform.Models.Email.EmailContactPropertyValue");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.ToTable("EmailContactPropertyValues", t =>
-                        {
-                            t.Property("Value")
-                                .HasColumnName("EmailContactStringPropertyValue_Value");
-                        });
 
                     b.HasDiscriminator().HasValue(EmailContactPropertyType.String);
                 });
