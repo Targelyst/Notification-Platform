@@ -19,45 +19,21 @@ interface SegmentListProps {
 
 const SegmentList = ({ segments, onEdit, onDuplicate, onDelete }: SegmentListProps) => {
     const columns = [
-        {
-            field: 'SegmentName',
-            sticky: true
-        },
-        { field: 'createdAt' },
-        { field: 'lastRun' },
-        { field: 'openRate' },
-        { field: 'clickRate' },
-        {
-            field: 'actions',
-            component: (row: Segment) => (
-                <select
-                    className="bg-impolar-bg-surface text-impolar-bg-text rounded-md px-2 py-1 text-sm border border-impolar-bg-highlight"
-                    value=""
-                    onChange={(e) => {
-                        const action = e.target.value;
-                        if (action === "edit") onEdit(row);
-                        if (action === "duplicate") onDuplicate(row);
-                        if (action === "delete") onDelete(row.id);
-                    }}
-                >
-                    <option value="" disabled>Actions</option>
-                    <option value="edit">Edit</option>
-                    <option value="duplicate">Duplicate</option>
-                    <option value="delete">Delete</option>
-                </select>
-            )
-        }
-    ];
+        { id: 'id', label: 'ID', show: true },
+        { id: 'name', label: 'Name', show: true },
+        { id: 'email', label: 'Email', show: false },
+        { id: 'role', label: 'Role' },
+      ];
+    
+      const rows = [
+        { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin' },
+        { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User' },
+      ];
 
     return (
-        <div className="p-4 flex-1">
-            <DataGrid<Segment>
-                columns={columns}
-                rows={segments}
-                selectable={true}
-                exportable={true}
-            />
-        </div>
+        <div className="container mx-auto p-4">
+        <DataGrid rows={rows} columns={columns} />
+      </div>
     );
 };
 

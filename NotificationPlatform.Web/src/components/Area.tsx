@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { FiArrowRight } from "react-icons/fi";
 
 const Area = ({
@@ -5,20 +7,25 @@ const Area = ({
     progress,
     children,
     link,
+    ressourcesText,
+    onClick
 }: {
     title?: string;
     progress?: number;
-    children: React.ReactNode;
+    children: ReactNode;
     link?: string;
+    ressourcesText?: string;
+    onClick?: () => void;
 }) => {
+    const { t } = useTranslation();
     return (
         <section className="bg-impolar-bg-surface rounded-2xl border border-impolar-bg-highlight p-4 md:p-6 shadow-xl hover:shadow-impolar-bg/30 transition-shadow min-w-0">
             <div className="flex justify-between items-center mb-6">
                 <div className="space-y-1">
                     <h2 className="text-xl font-semibold text-impolar-bg-text flex items-center gap-3">
-                        {title}
+                        {t(`${title}`)}
                         {progress && <span className="text-xs font-medium px-2 py-1 bg-impolar-bg-highlight rounded-md text-impolar-bg-text">
-                            {progress}% Complete
+                            {progress}% {t('complete')}
                         </span>}
                     </h2>
                     {progress && <div className="w-48 h-1.5 bg-impolar-bg-highlight rounded-full overflow-hidden">
@@ -28,18 +35,17 @@ const Area = ({
                         />
                     </div>}
                 </div>
-                {link && <a
-                    href={link}
+                {link && <button
+                    type="button"
+                    onClick={onClick}
                     className="flex items-center gap-1 text-impolar-bg-text/80 hover:text-impolar-bg-text text-sm transition-colors ml-3"
                 >
-                    View all resources
+                    {t(`${ressourcesText}`)}
                     <FiArrowRight className="mt-0.5" />
-                </a>}
+                </button>}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {children}
-            </div>
         </section>
     );
 };

@@ -63,7 +63,7 @@ export function Footer() {
 
   return (
     <footer className="bg-impolar-bg text-impolar-bg-text">
-      <div className="mx-auto max-w-7xl px-6 pt-12 pb-8 sm:px-6 ">
+      <div className="px-2 pt-12 pb-8 sm:px-20">
         {/* Newsletter Section */}
         <div className="mb-16 flex flex-col justify-between gap-8 md:flex-row border-b border-impolar-bg-highlight pb-4">
           <div className="max-w-md space-y-4 ">
@@ -104,6 +104,7 @@ export function Footer() {
             </p>
             {/* Add Cookie Icon */}
             <button
+              type="button"
               onClick={() => CookieConsent.showPreferences()}
               className="text-impolar-bg-text hover:text-impolar-primary transition-colors"
               aria-label="Cookie preferences"

@@ -21,6 +21,7 @@ const resources = {
 			logout: "Logout",
 			shop: "Shop",
 			user: "User",
+			view_all_ressources: "View all ressources",
 		},
 	},
 };

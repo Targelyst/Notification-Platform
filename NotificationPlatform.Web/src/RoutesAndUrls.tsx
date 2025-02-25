@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import Home from "./pages/home/Home";
 import AnalyticsDashboard from "./pages/analytics/AnalyticsDashboard";
 import i18n from './i18n';
@@ -11,6 +11,7 @@ interface PageUrlsProps {
     component?: ReactNode;
 }
 
+// biome-ignore lint/complexity/noStaticOnlyClass: <explanation>
 export class RoutesAndUrls {
     public static readonly HOME: PageUrlsProps = {
         pageName: i18n.t('home'),

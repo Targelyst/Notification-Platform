@@ -12,6 +12,7 @@ import { BiSolidDashboard } from "react-icons/bi";
 import { NavigationRoutes } from "../NavigationRoutes";
 import { UserWidget } from "../components/UserWidget";
 import { useAvailableProjects, useCurrentProject } from "../api/projects";
+import { Dropdown } from "./Dropdown";
 
 interface SidebarProps {
   isMobile: boolean;
@@ -37,6 +38,7 @@ const Sidebar = ({
 
   const [isLocalUserMenuOpen, setIsLocalUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const userMenuTriggerRef = useRef<HTMLDivElement>(null);
 
   const onProjectAdd = () => {
     console.warn("Add project is not implemented.");
@@ -59,13 +61,17 @@ const Sidebar = ({
 
   return (
     <nav className="flex flex-col h-full space-y-1">
-      <div className="mb-4 relative" ref={userMenuRef}>
+      <div className="mb-4 relative">
         <div
-          className="flex items-center bg-impolar-bg-highlight justify-between p-2 rounded-lg cursor-pointer hover:bg-impolar-bg-highlight transition-colors"
+          ref={userMenuTriggerRef}
+          className="flex items-center bg-impolar-bg-highlight/50 hover:bg-impolar-bg-highlight/70 backdrop-blur-sm transition-all p-2.5 rounded-xl shadow-sm justify-between cursor-pointer"
           onKeyDown={() => setIsUserMenuOpen(!isUserMenuOpen)}
+          onClick={(e) => {
+            setIsUserMenuOpen(!isUserMenuOpen);
+          }}
         >
           <div className="flex items-center space-x-2">
-            <div className="bg-gradient-to-r from-emerald-400 to-impolar-secondary transition-all p-1.5 rounded-lg">
+            <div className="bg-gradient-to-r from-emerald-400 to-impolar-secondary transition-all p-1.5 rounded-xl">
               <BiSolidDashboard className="w-4 h-4 text-impolar-primary" />
             </div>
             {currentProject ? (
@@ -73,22 +79,21 @@ const Sidebar = ({
                 {currentProject.name}
               </span>
             ) : (
-              <span>Loading</span>
+              <span className="text-sm">Loading</span>
             )}
           </div>
           <FiChevronDown
-            className={`text-impolar-primary-text transform transition-transform ${
-              isUserMenuOpen ? "rotate-180" : ""
-            }`}
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsUserMenuOpen(!isUserMenuOpen);
-            }}
+            className={`text-impolar-primary-text transform transition-transform duration-400 mr-2 ${isUserMenuOpen ? "rotate-180" : ""
+              }`}
           />
         </div>
 
-        <div className={`absolute w-full z-10 ${isUserMenuOpen ? "block" : "hidden"}`}>
-          <div className="bg-impolar-bg-surface rounded-lg shadow-lg border border-impolar-bg-highlight mt-1">
+        <Dropdown
+          targetRef={userMenuTriggerRef}
+          isOpen={isUserMenuOpen}
+          className="w-full bg-impolar-bg-surface rounded-xl shadow-xl border border-impolar-bg-highlight/30"
+        >
+          <div className="rounded-xl mt-1 overflow-hidden">
             {(availableProjects?.projects ?? [])
               .filter((project) => project.id !== currentProject?.id)
               .map((project) => (
@@ -107,23 +112,25 @@ const Sidebar = ({
             <button
               type="button"
               onClick={onProjectAdd}
-              className="w-full px-3 py-2 text-left hover:bg-impolar-secondary/10 rounded-md transition-colors text-impolar-bg-highlight-text text-sm flex items-center space-x-2"
+              className="w-full px-3 py-2 text-left hover:bg-impolar-secondary/10 transition-colors text-impolar-bg-highlight-text text-sm flex items-center space-x-2 group"
             >
-              <span className="text-impolar-bg-surface-text">+</span>
+              <span className="w-5 h-5 flex items-center justify-center bg-impolar-primary/10 rounded-md group-hover:bg-impolar-primary/20 transition-colors">
+                +
+              </span>
+              <span className="p-1">New Project</span>
             </button>
           </div>
-        </div>
+        </Dropdown>
       </div>
 
       <div className="space-y-1 flex-1 overflow-auto">
         {NavigationRoutes.map((route) => (
           <div key={route.path}>
             <div
-              className={`w-full flex items-center justify-between p-2 rounded-lg transition-all duration-200 group ${
-                location.pathname === route.path
-                  ? "bg-impolar-secondary/10"
-                  : "hover:bg-impolar-bg-highlight text-impolar-bg-surface-text"
-              }`}
+              className={`w-full flex items-center justify-between p-3 rounded-lg transition-all duration-100 group ${location.pathname === route.path
+                ? "bg-gradient-to-r from-impolar-primary/30 to-impolar-bg-highlight shadow-sm"
+                : "hover:bg-impolar-bg-highlight/40 text-impolar-bg-surface-text hover:shadow-md"
+                }`}
             >
               <NavLink
                 to={route.path}
@@ -140,14 +147,14 @@ const Sidebar = ({
                   type="button"
                   onClick={(e) => {
                     e.preventDefault();
+                    e.stopPropagation(); // Prevent NavLink navigation
                     toggleSubmenu(route.path);
                   }}
-                  className="text-impolar-secondary hover:text-impolar-secondary p-1"
+                  className="text-impolar-secondary hover:text-impolar-primary p-1 transition-colors"
                 >
                   <FiChevronDown
-                    className={`transform transition-transform text-xs ${
-                      openSubmenus[route.path] ? "rotate-180" : ""
-                    }`}
+                    className={`transform transition-transform duration-300 text-xs w-4 h-4 text-impolar-secondary ${openSubmenus[route.path] ? "rotate-180" : "rotate-0"
+                      }`}
                   />
                 </button>
               )}
@@ -155,21 +162,19 @@ const Sidebar = ({
 
             {route.children && (
               <div
-                className={`ml-6 pl-2 space-y-1 overflow-hidden transition-all duration-300 ease-out ${
-                  openSubmenus[route.path]
-                    ? "max-h-[1000px] opacity-100 border-l border-impolar-bg-highlight"
-                    : "max-h-0 opacity-0"
-                }`}
+                className={`ml-6 pl-2 space-y-1 overflow-hidden transition-all duration-300 ease-out ${openSubmenus[route.path]
+                  ? "max-h-[1000px] opacity-100 border-l border-impolar-bg-highlight/30"
+                  : "max-h-0 opacity-0"
+                  }`}
               >
                 {route.children.map((child) => (
                   <NavLink
                     key={child.path}
                     to={child.path}
                     className={({ isActive }) =>
-                      `flex items-center p-1.5 rounded-md transition-colors text-sm ${
-                        isActive
-                          ? "bg-impolar-secondary/20 font-medium"
-                          : "text-impolar-bg-surface-text hover:bg-impolar-bg-highlight"
+                      `flex items-center p-2 rounded-xl text-sm ${isActive
+                        ? "bg-gradient-to-r from-impolar-primary/30 to-impolar-bg-highlight font-medium p-2.5 ml-0.5 "
+                        : "text-impolar-bg-surface-text hover:bg-impolar-bg-highlight/30 p-2.5 ml-0.5"
                       }`
                     }
                   >
@@ -183,19 +188,19 @@ const Sidebar = ({
         ))}
       </div>
 
-      <div className="mt-auto space-y-1 border-impolar-bg-highlight pt-2">
+      <div className="mt-auto space-y-1 border-impolar-bg-highlight/30 pt-2">
         <button
           type="button"
-          className="w-full flex items-center p-2 rounded-lg transition-colors text-impolar-bg-highlight-text hover:bg-impolar-secondary/10 text-sm"
+          className="w-full flex items-center p-2.5 rounded-xl transition-all text-impolar-bg-highlight-text hover:bg-impolar-secondary/10 hover:shadow-sm text-sm group"
         >
-          <FiSettings className="w-4 h-4 mr-2" />
+          <FiSettings className="w-4 h-4 mr-2 transition-transform group-hover:rotate-12" />
           {t("settings")}
         </button>
         <button
           type="button"
-          className="w-full flex items-center p-2 rounded-lg transition-colors text-impolar-bg-highlight-text hover:bg-impolar-secondary/10 text-sm"
+          className="w-full flex items-center p-2.5 rounded-xl transition-all text-impolar-bg-highlight-text hover:bg-impolar-secondary/10 hover:shadow-sm text-sm group"
         >
-          <FiLifeBuoy className="w-4 h-4 mr-2" />
+          <FiLifeBuoy className="w-4 h-4 mr-2 transition-transform group-hover:-rotate-12" />
           {t("shop")}
         </button>
 
@@ -254,13 +259,13 @@ export const Navigation = ({
       document.removeEventListener("mousedown", handleClickOutside);
       window.removeEventListener("resize", handleResize);
     };
-  }, [setIsMobileMenuOpen]); // Fixed dependency array
+  }, [setIsMobileMenuOpen]);
 
   return (
     <>
       <button
         type="button"
-        className="lg:hidden fixed bottom-12 right-5 p-3 bg-impolar-bg-surface backdrop-blur-xs rounded-full shadow-lg border border-impolar-bg-highlight hover:border-impolar-primary transition-all z-50"
+        className="lg:hidden fixed bottom-12 right-5 p-3 bg-impolar-bg-surface backdrop-blur-xs rounded-full shadow-lg border border-impolar-bg-highlight hover:border-impolar-primary transition-all"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
         {isMobileMenuOpen ? (
@@ -270,7 +275,7 @@ export const Navigation = ({
         )}
       </button>
 
-      <div className="hidden lg:block left-0 w-64 h-screen pb-6 max-h-22/23 bg-impolar-bg text-impolar-bg-surface-text z-40 p-4 m-3 mt-4">
+      <div className="hidden lg:block left-0 w-64 h-screen pb-6 max-h-22/23 bg-impolar-bg text-impolar-bg-surface-text z-10 p-4 m-3 mt-4 ">
         <Sidebar
           isMobile={false}
           openSubmenus={openSubmenus}
@@ -282,15 +287,14 @@ export const Navigation = ({
 
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
-          onClick={() => setIsMobileMenuOpen(false)} // Changed to onClick
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-10 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
       <div
         ref={sidebarRef}
-        className={`lg:hidden fixed inset-y-0 left-0 transform ${
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 ease-out-expo w-64 bg-impolar-bg text-impolar-bg-surface-text flex flex-col z-50 p-4 pt-6 border-r border-impolar-bg-highlight`}
+        className={`lg:hidden fixed inset-y-0 left-0 transform ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+          } transition-transform duration-300 ease-out-expo w-64 bg-impolar-bg text-impolar-bg-surface-text flex flex-col z-50 p-4 pt-6 border-r border-impolar-bg-highlight/30 shadow-2xl`}
       >
         <Sidebar
           isMobile={true}

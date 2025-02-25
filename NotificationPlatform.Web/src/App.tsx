@@ -3,11 +3,13 @@ import "./i18n";
 import Dashboard from "./components/Dashboard";
 import { ApiProvider } from "./components/ApiProvider";
 import { AuthGuard, AuthProvider } from "./components/AuthProvider";
+import { MantineProvider } from "@mantine/core";
 
 const App = () => {
 	return (
 		<AuthProvider>
-			<div className="h-full bg-impolar-bg">
+			<MantineProvider >
+			<div className="h-full  bg-impolar-bg overflow-auto">
 				<div className="relative flex ">
 					<ApiProvider>
 						<Router>
@@ -20,6 +22,7 @@ const App = () => {
 					</ApiProvider>
 				</div>
 			</div>
+			</MantineProvider > 
 		</AuthProvider>
 	);
 };

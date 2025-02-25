@@ -1,5 +1,5 @@
 
-import BasicLayout from '../../BasicLayot'
+import BasicLayout from '../../components/BasicLayot'
 import Area from '../../components/Area'
 import { RoutesAndUrls } from '../../RoutesAndUrls'
 

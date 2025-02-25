@@ -72,13 +72,13 @@ export default function Dashboard() {
 					setIsMobileMenuOpen={setIsMobileMenuOpen}
 				/>
 
-				<div className="flex flex-col flex-1 lg:mt-4 lg:mb-4 lg:mr-4 overflow-y-auto">
+				<div className="flex flex-col flex-1 lg:mt-4 lg:mb-4 lg:mr-4 overflow-y-auto ">
 					<div className="bg-gradient-to-br from-impolar-bg-surface/90 via-impolar-bg-surface/20 to-impolar-bg-highlight/50 rounded-b-lg lg:rounded-2xl border-impolar-bg-highlight/30 border">
 						<div className="flex items-center justify-between p-3 border-b-2 border-impolar-bg-highlight/30 sticky top-0 z-10  backdrop-blur-sm rounded-t-2xl mt-0.5 ">
 							<Breadcrumb
 								pathSegments={pathSegments}
 								navigate={navigate}
-								onChevronClick={() => { setIsMobileMenuOpen(!isMobileMenuOpen); console.log("log") }}
+								onChevronClick={() => { setIsMobileMenuOpen(!isMobileMenuOpen) }}
 							/>
 
 							<div className="flex items-center gap-2">
@@ -99,8 +99,8 @@ export default function Dashboard() {
 							</div>
 						</div>
 
-						<main className="md:p-2 mb-22 mt-4 min-h-[calc(100vh-260px)]">
-							<div key={location.key} className="animate-fadeIn">
+						<main className="mb-22 mt-4 min-h-[calc(100vh-260px)]">
+							<div key={location.key} className="animate-fadeIn m-w-full flex-1">
 								<Routes>
 									{pageUrlsArray.map((route) => (
 										<Route key={route.urlPath} path={route.urlPath} element={route.component} />

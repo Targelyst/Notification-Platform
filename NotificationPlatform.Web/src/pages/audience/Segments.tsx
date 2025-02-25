@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { SegmentBuilder } from '../../components/SegmentBuilder';
-import SegmentList, { Segment } from '../../components/SegmentList';
-import { RightSidebar } from '../../components/RightSidebar';
-import BasicLayout from '../../BasicLayot';
+import type { Segment } from '../../components/SegmentList';
+import BasicLayout from '../../components/BasicLayot';
 import Area from '../../components/Area';
+import { Bottombar } from '../../components/BottomBar';
+import Example from '../../components/Datagrid';
 
 const initialSegments: Segment[] = [
     {
@@ -18,79 +18,31 @@ const initialSegments: Segment[] = [
 ];
 
 export default function Segments() {
-    const [segments, setSegments] = useState<Segment[]>(initialSegments);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [editedSegment, setEditedSegment] = useState<Segment | null>(null);
-    const [isDuplicating, setIsDuplicating] = useState(false);
+    const [dockState, setDockState] = useState(false);
 
-    const handleSaveSegment = (newSegment: Omit<Segment, 'id' | 'createdAt' | 'lastRun' | 'openRate' | 'clickRate'>) => {
-        if (editedSegment) {
-            const updated = segments.map(s =>
-                s.id === editedSegment.id ? { ...s, ...newSegment } : s
-            );
-            setSegments(updated);
-        } else {
-            const newId = Date.now().toString();
-            setSegments(prev => [...prev, {
-                ...newSegment,
-                id: newId,
-                createdAt: new Date().toISOString(),
-                lastRun: new Date().toISOString(),
-                openRate: 0,
-                clickRate: 0
-            }]);
-        }
-        setIsSidebarOpen(false);
-    };
-
-    const handleEdit = (segment: Segment) => {
-        setEditedSegment(segment);
-        setIsDuplicating(false);
-        setIsSidebarOpen(true);
-    };
-
-    const handleDuplicate = (segment: Segment) => {
-        setEditedSegment({ ...segment, id: '', SegmentName: `${segment.SegmentName} Copy` });
-        setIsDuplicating(true);
-        setIsSidebarOpen(true);
-    };
-
-    const handleDelete = (id: string) => {
-        setSegments(prev => prev.filter(s => s.id !== id));
-    };
 
     return (
 
-        <BasicLayout title='Contacts' description='Manage your audienceManage your audience'>
-            <div><Area title='asd'>
-                <div className="flex gap-8">
-                    <SegmentList
-                        segments={segments}
-                        onEdit={handleEdit}
-                        onDuplicate={handleDuplicate}
-                        onDelete={handleDelete}
-                    />
-
-                    {isSidebarOpen && (
-                        <RightSidebar
-                            width={400}
-                            title={isDuplicating ? 'Duplicate Segment' : 'Edit Segment'}
-                            onClose={() => setIsSidebarOpen(false)}
-                        >
-                            <SegmentBuilder
-                                initialQuery={editedSegment?.query}
-                                onSave={(query) => handleSaveSegment({
-                                    ...editedSegment!,
-                                    SegmentName: editedSegment!.SegmentName,
-                                    query
-                                })}
-                                onClose={() => setIsSidebarOpen(false)}
-                            />
-                        </RightSidebar>
-                    )}
-                </div></Area>
+        <div>
+            <BasicLayout title='Segments' description='Manage your audienceManage your audience'>
+                <Area title='Segment List'>
+                    <div className="flex gap-8">
+                        <Bottombar initialHeight={1200} isDocked={dockState} onDockChange={setDockState} >
+                            <div className="p-4">
+                                <h3 className="text-lg font-medium mb-4">Bottombar Content</h3>
+                                <p>Custom content goes here...</p>
+                            </div>
+                        </Bottombar>
+                    </div>
+                </Area>
+            </BasicLayout>
+            <div className='w-full bg-impolar-bg-surface flex flex-wrap '><div className='flex gap-4 space-x-12 space-y-12'>
+                <div className="overflow-hidden max-w-full">
+                    <Example />
+                </div>
             </div>
-        </BasicLayout>
+            </div>
+        </div>
 
     );
 }
