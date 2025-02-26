@@ -4,6 +4,7 @@ import AnalyticsDashboard from "./pages/analytics/AnalyticsDashboard";
 import i18n from './i18n';
 import Segments from "./pages/audience/Segments";
 import { Contacts } from "./pages/contacts/Contacts";
+import { UserPage } from "./pages/user/UserPage";
 
 interface PageUrlsProps {
     pageName: string;
@@ -85,6 +86,7 @@ export class RoutesAndUrls {
     public static readonly USER: PageUrlsProps = {
         pageName: i18n.t('user'),
         urlPath: `/${i18n.t('user').toLowerCase()}`,
+        component: <UserPage />,
     };
     // Footer links
     public static readonly PRODUCT: PageUrlsProps = {

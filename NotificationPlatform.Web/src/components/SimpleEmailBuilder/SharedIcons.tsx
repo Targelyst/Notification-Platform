@@ -35,7 +35,8 @@ export const TrashIcon = () => (
 
 export const AddButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   <button
-    className="absolute left-0 -ml-6 opacity-0 group-hover:opacity-100 transition-opacity"
+    type="button"
+    className="opacity-0 hover:opacity-100"
     onClick={onClick}
   >
     +
