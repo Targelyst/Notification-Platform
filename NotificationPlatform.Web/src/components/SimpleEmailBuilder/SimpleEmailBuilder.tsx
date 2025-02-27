@@ -124,51 +124,49 @@ const SimpleEmailBuilder: FC = () => {
       sourceColumnIndex: number,
       blockId: string,
       targetParentId: string,
-      targetColumnIndex: number
+      targetColumnIndex: number,
+      insertIndex: number = -1 // New parameter
     ) => {
       setBlocks((prevBlocks) => {
-        // Clone blocks to avoid mutation
         const newBlocks = [...prevBlocks];
-  
+        
         // Find source parent and remove the block
         const sourceParent = newBlocks.find((b) => b.id === sourceParentId);
         if (!sourceParent?.children) return prevBlocks;
-  
+        
         const sourceColumn = [...sourceParent.children[sourceColumnIndex]];
         const blockIndex = sourceColumn.findIndex((b) => b.id === blockId);
         if (blockIndex === -1) return prevBlocks;
-  
+        
         const [movedBlock] = sourceColumn.splice(blockIndex, 1);
         sourceParent.children[sourceColumnIndex] = sourceColumn;
-  
+        
         // Update source parent MJML
         sourceParent.mjml = `<mj-section>${sourceParent.children
           .map((col) => `<mj-column>${col.map((c) => c.mjml).join("")}</mj-column>`)
           .join("")}</mj-section>`;
-  
+        
         // Find target parent and add the block
         const targetParent = newBlocks.find((b) => b.id === targetParentId);
         if (!targetParent?.children) return prevBlocks;
-  
+        
         const targetColumn = [...(targetParent.children[targetColumnIndex] || [])];
         
-        // Add to specific position (or end if no specific position)
-        targetColumn.push(movedBlock);
+        // Add at specific position if provided, otherwise append to end
+        if (insertIndex >= 0 && insertIndex <= targetColumn.length) {
+          targetColumn.splice(insertIndex, 0, movedBlock);
+        } else {
+          targetColumn.push(movedBlock);
+        }
+        
         targetParent.children[targetColumnIndex] = targetColumn;
-  
+        
         // Update target parent MJML
         targetParent.mjml = `<mj-section>${targetParent.children
           .map((col) => `<mj-column>${col.map((c) => c.mjml).join("")}</mj-column>`)
           .join("")}</mj-section>`;
-  
-        // Make sure we're returning a valid state that won't filter out blocks
-        return newBlocks.map(block => block || {
-          id: Date.now().toString(),
-          type: "text",
-          content: "Placeholder",
-          mjml: "<mj-text>Placeholder</mj-text>",
-          styles: {}
-        });
+        
+        return newBlocks;
       });
     },
     []
@@ -192,70 +190,69 @@ const SimpleEmailBuilder: FC = () => {
     });
   }, []);
 
-const moveBlockToColumn = useCallback(
-  (blockId: string, parentId: string, columnIndex: number, insertIndex: number = -1) => {
-    setBlocks((prev) => {
-      // Find the block to move
-      const blockIndex = prev.findIndex((b) => b.id === blockId);
-      if (blockIndex === -1) return prev;
-
-      const blockToMove = prev[blockIndex];
-
-      // Remove the block from the blocks array
-      const newBlocks = [...prev];
-      newBlocks.splice(blockIndex, 1);
-
-      // Now add the block to the specified column in the specified parent block
-      newBlocks.forEach((block) => {
-        if (block.id === parentId && block.children) {
-          // Remove wrapping from blockToMove
-          const unwrappedBlock = {
-            ...blockToMove,
-            mjml: stripMjmlWrapping(blockToMove.mjml),
-          };
-
-          const newChildren = block.children.map((col, idx) => {
-            if (idx === columnIndex) {
-              if (insertIndex >= 0 && insertIndex <= col.length) {
-                // Insert at specific position
-                return [
-                  ...col.slice(0, insertIndex),
-                  unwrappedBlock,
-                  ...col.slice(insertIndex)
-                ];
+  const moveBlockToColumn = useCallback(
+    (blockId: string, parentId: string, columnIndex: number, insertIndex: number = -1) => {
+      setBlocks((prev) => {
+        // Find the block to move
+        const blockIndex = prev.findIndex((b) => b.id === blockId);
+        if (blockIndex === -1) return prev;
+  
+        const blockToMove = prev[blockIndex];
+  
+        // Remove the block from the blocks array
+        const newBlocks = [...prev];
+        newBlocks.splice(blockIndex, 1);
+  
+        // Now add the block to the specified column in the specified parent block
+        newBlocks.forEach((block) => {
+          if (block.id === parentId && block.children) {
+            // Remove wrapping from blockToMove
+            const unwrappedBlock = {
+              ...blockToMove,
+              mjml: stripMjmlWrapping(blockToMove.mjml),
+            };
+  
+            const newChildren = block.children.map((col, idx) => {
+              if (idx === columnIndex) {
+                if (insertIndex >= 0 && insertIndex <= col.length) {
+                  // Insert at specific position
+                  return [
+                    ...col.slice(0, insertIndex),
+                    unwrappedBlock,
+                    ...col.slice(insertIndex)
+                  ];
+                } else {
+                  // Default behavior - append to end
+                  return [...col, unwrappedBlock];
+                }
               } else {
-                // Default behavior - append to end
-                return [...col, unwrappedBlock];
+                return col;
               }
-            } else {
-              return col;
-            }
-          });
-
-          // Update the block's mjml
-          const updatedBlock = {
-            ...block,
-            children: newChildren,
-            mjml: `<mj-section>${newChildren
-              .map(
-                (column) =>
-                  `<mj-column>${column.map((child) => child.mjml).join("")}</mj-column>`
-              )
-              .join("")}</mj-section>`,
-          };
-
-          // Replace the block
-          const blockIdx = newBlocks.findIndex((b) => b.id === block.id);
-          newBlocks[blockIdx] = updatedBlock;
-        }
+            });
+  
+            // Update the block's mjml
+            const updatedBlock = {
+              ...block,
+              children: newChildren,
+              mjml: `<mj-section>${newChildren
+                .map(
+                  (column) =>
+                    `<mj-column>${column.map((child) => child.mjml).join("")}</mj-column>`
+                )
+                .join("")}</mj-section>`,
+            };
+  
+            // Replace the block
+            const blockIdx = newBlocks.findIndex((b) => b.id === block.id);
+            newBlocks[blockIdx] = updatedBlock;
+          }
+        });
+  
+        return newBlocks;
       });
-
-      return newBlocks;
-    });
-  },
-  []
-);
-
+    },
+    []
+  );
   // Helper function to remove wrapping
   function stripMjmlWrapping(mjml: string): string {
     // Remove '<mj-section><mj-column>' and '</mj-column></mj-section>' from the mjml
