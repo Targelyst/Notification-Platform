@@ -79,13 +79,20 @@ export const useDraggableChildBlock = (
 
   const [, drop] = useDrop<DragItem>({
     accept: "child-block",
-    hover(item) {
+    hover(item, monitor) {
       if (!ref.current || item.id === blockId) return;
-      const dragIndex = item.index;
-      const hoverIndex = index;
-      if (dragIndex === hoverIndex) return;
-      moveChildBlock(columnIndex, dragIndex, hoverIndex);
-      item.index = hoverIndex;
+
+      // Only handle hover if it's in the same column
+      if (item.columnIndex === columnIndex) {
+        const dragIndex = item.index;
+        const hoverIndex = index;
+        if (dragIndex === hoverIndex) return;
+
+        moveChildBlock(columnIndex, dragIndex, hoverIndex);
+
+        // Update both index and columnIndex
+        item.index = hoverIndex;
+      }
     },
   });
 
@@ -166,6 +173,9 @@ const ColumnComponent: React.FC<ColumnComponentProps> = ({
           const [{ isOver }, drop] = useDrop({
             accept: ["text", "image", "child-block"],
             drop: (item: DragItem, monitor) => {
+              // Only process if this is the direct drop target
+              if (!monitor.isOver({ shallow: true })) return undefined;
+
               const itemType = monitor.getItemType();
               if (itemType === "child-block") {
                 moveChildBlockBetweenColumns(
@@ -175,12 +185,14 @@ const ColumnComponent: React.FC<ColumnComponentProps> = ({
                   block.id,
                   colIndex
                 );
+                return { handled: true }; // Signal that we handled the drop
               } else {
                 moveBlockToColumn(item.id, block.id, colIndex);
+                return { handled: true }; // Signal that we handled the drop
               }
             },
             collect: (monitor) => ({
-              isOver: monitor.isOver(),
+              isOver: monitor.isOver({ shallow: true }), // Only count direct drops
             }),
           });
 
@@ -268,11 +280,21 @@ const DraggableChildBlock: React.FC<DraggableChildBlockProps> = ({
     index: childIndex,
     updateBlock: updateChildBlock,
     deleteBlock: deleteChildBlock,
-    addBlockBelow: () => {},
+    addBlockBelow: () => { },
   };
 
   return (
-    <div ref={ref} style={{ opacity: isDragging ? 0.5 : 1 }}>
+    <div
+      ref={ref}
+      style={{
+        opacity: isDragging ? 0.5 : 1,
+        border: '1px solid blue',  // Debug outline
+        margin: '4px'
+      }}
+    >
+      <small style={{ color: 'green' }}>
+        ID: {child.id.substring(0, 4)}... Col: {columnIndex}, Idx: {childIndex}
+      </small>
       {child.type === "text" ? (
         <TextComponent {...commonProps} />
       ) : (
