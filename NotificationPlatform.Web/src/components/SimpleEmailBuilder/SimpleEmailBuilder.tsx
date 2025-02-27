@@ -1,10 +1,10 @@
 // components/SimpleEmailBuilder/SimpleEmailBuilder.tsx
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type { FC } from "react";
-import { DndProvider } from "react-dnd";
+import { DndProvider, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import mjml2html from "mjml-browser";
-import ColumnComponent, { Block, BlockType } from "./Components/ColumnComponent";
+import ColumnComponent, { Block, BlockType, DragItem } from "./Components/ColumnComponent";
 import ImageComponent from "./Components/ImageComponent";
 import TextComponent from "./Components/TextComponent";
 
@@ -70,6 +70,54 @@ const SimpleEmailBuilder: FC = () => {
     }
   }, [blocks, generateFullMJML]);
 
+  const moveChildBlockToMainBlocks = useCallback(
+    (parentId: string, columnIndex: number, blockId: string) => {
+      setBlocks((prevBlocks) => {
+        const newBlocks = [...prevBlocks];
+
+        // Find the parent block
+        const parentBlockIndex = newBlocks.findIndex((b) => b.id === parentId);
+        if (parentBlockIndex === -1) return prevBlocks;
+
+        const parentBlock = newBlocks[parentBlockIndex];
+
+        if (!parentBlock.children) return prevBlocks;
+
+        // Remove the block from its column
+        const columnChildren = [...parentBlock.children[columnIndex]];
+        const blockIndex = columnChildren.findIndex((b) => b.id === blockId);
+        if (blockIndex === -1) return prevBlocks;
+
+        const [movedBlock] = columnChildren.splice(blockIndex, 1);
+
+        // Update parent's children
+        parentBlock.children[columnIndex] = columnChildren;
+
+        // Update parent's MJML
+        parentBlock.mjml = `<mj-section>${parentBlock.children
+          .map(
+            (column) => `<mj-column>${column.map((c) => c.mjml).join("")}</mj-column>`
+          )
+          .join("")}</mj-section>`;
+
+        // Wrap the moved block's MJML appropriately
+        const wrappedMjml = `<mj-section><mj-column>${movedBlock.mjml}</mj-column></mj-section>`;
+
+        // Create a new block with updated MJML
+        const newMovedBlock: Block = {
+          ...movedBlock,
+          mjml: wrappedMjml,
+        };
+
+        // Add the block to the end of main blocks list
+        newBlocks.push(newMovedBlock);
+
+        return newBlocks;
+      });
+    },
+    []
+  );
+
   const moveChildBlockBetweenColumns = useCallback(
     (
       sourceParentId: string,
@@ -81,36 +129,36 @@ const SimpleEmailBuilder: FC = () => {
       setBlocks((prevBlocks) => {
         // Clone blocks to avoid mutation
         const newBlocks = [...prevBlocks];
-        
+
         // Find source parent and remove the block
-        const sourceParent = newBlocks.find(b => b.id === sourceParentId);
+        const sourceParent = newBlocks.find((b) => b.id === sourceParentId);
         if (!sourceParent?.children) return prevBlocks;
-        
+
         const sourceColumn = [...sourceParent.children[sourceColumnIndex]];
-        const blockIndex = sourceColumn.findIndex(b => b.id === blockId);
+        const blockIndex = sourceColumn.findIndex((b) => b.id === blockId);
         if (blockIndex === -1) return prevBlocks;
-        
+
         const [movedBlock] = sourceColumn.splice(blockIndex, 1);
         sourceParent.children[sourceColumnIndex] = sourceColumn;
-        
+
         // Update source parent MJML
         sourceParent.mjml = `<mj-section>${sourceParent.children
-          .map(col => `<mj-column>${col.map(c => c.mjml).join('')}</mj-column>`)
-          .join('')}</mj-section>`;
-  
+          .map((col) => `<mj-column>${col.map((c) => c.mjml).join("")}</mj-column>`)
+          .join("")}</mj-section>`;
+
         // Find target parent and add the block
-        const targetParent = newBlocks.find(b => b.id === targetParentId);
+        const targetParent = newBlocks.find((b) => b.id === targetParentId);
         if (!targetParent?.children) return prevBlocks;
-        
+
         const targetColumn = [...(targetParent.children[targetColumnIndex] || [])];
         targetColumn.push(movedBlock);
         targetParent.children[targetColumnIndex] = targetColumn;
-        
+
         // Update target parent MJML
         targetParent.mjml = `<mj-section>${targetParent.children
-          .map(col => `<mj-column>${col.map(c => c.mjml).join('')}</mj-column>`)
-          .join('')}</mj-section>`;
-  
+          .map((col) => `<mj-column>${col.map((c) => c.mjml).join("")}</mj-column>`)
+          .join("")}</mj-section>`;
+
         return newBlocks;
       });
     },
@@ -135,7 +183,6 @@ const SimpleEmailBuilder: FC = () => {
     });
   }, []);
 
-  // New function to move a block into a column
   const moveBlockToColumn = useCallback(
     (blockId: string, parentId: string, columnIndex: number) => {
       setBlocks((prev) => {
@@ -357,8 +404,17 @@ const SimpleEmailBuilder: FC = () => {
     return true;
   };
 
+  // Set up the main blocks area to accept dropped child blocks
+  const [, drop] = useDrop<DragItem>({
+    accept: ["child-block"],
+    drop: (item: DragItem) => {
+      if (item.type === "child-block") {
+        moveChildBlockToMainBlocks(item.parentId!, item.columnIndex!, item.id);
+      }
+    },
+  });
+
   return (
-    <DndProvider backend={HTML5Backend}>
       <div className="flex justify-center">
         <div className="p-8 m-4 bg-white rounded-xl shadow-lg transition-all duration-300 ease-in-out">
           <div className="flex gap-4 mb-12">
@@ -385,7 +441,10 @@ const SimpleEmailBuilder: FC = () => {
           </div>
 
           <div className="flex gap-6 flex-col max-w-[800px] p-7 bg-gray-50 rounded-xl shadow-inner transition-all duration-300">
-            <div className="flex-1 m-4 p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div
+              className="flex-1 m-4 p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
+              ref={drop}
+            >
               {blocks
                 .filter((block) => !!block)
                 .map((block, index) =>
@@ -407,7 +466,7 @@ const SimpleEmailBuilder: FC = () => {
                             }
                           }}
                           addBlockToColumn={addBlockToColumn}
-                          moveBlockToColumn={moveBlockToColumn} // Passing the new function as a prop
+                          moveBlockToColumn={moveBlockToColumn}
                           moveChildBlockBetweenColumns={moveChildBlockBetweenColumns}
                         />
                       ) : block.type === "text" ? (
@@ -470,7 +529,7 @@ const SimpleEmailBuilder: FC = () => {
 
               <div
                 className="border rounded-lg overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md"
-                // biome-ignore lint/security/noDangerouslySetInnerHtml: <no way around this>
+                // eslint-disable-next-line react/no-danger
                 dangerouslySetInnerHTML={{ __html: previewHtml }}
               />
 
@@ -484,7 +543,6 @@ const SimpleEmailBuilder: FC = () => {
           </div>
         </div>
       </div>
-    </DndProvider>
   );
 };
 
