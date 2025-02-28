@@ -28,6 +28,17 @@ public static class EmailQueries {
 
     [UsePaging]
     [UseProjection]
+    [UseFiltering]
+    public static IQueryable<EmailSegment> GetEmailSegments(
+        Guid emailConfigurationId,
+        NotificationPlatformContext db
+    ) => db.EmailSegments
+            .Where(ec => ec.EmailConfigurationId == emailConfigurationId)
+            .OrderBy(ec => ec.Id)
+            .ThenBy(ec => ec.Id);
+
+    [UsePaging]
+    [UseProjection]
     public static async Task<IQueryable<EmailContact>> GetEmailContactsBySegmentAsync(
         Guid segmentId,
         ILoggerFactory loggerFactory,
