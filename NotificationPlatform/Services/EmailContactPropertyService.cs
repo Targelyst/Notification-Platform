@@ -8,17 +8,7 @@ namespace NotificationPlatform.Services;
 public class BulkAddEmailContactPropertyDTO {
 
     public required Guid PropertyId { get; set; }
-    public required EmailContactPropertyValueInnerDTO PropertyValue { get; set; }
-
-}
-
-[OneOf]
-public class EmailContactPropertyValueInnerDTO {
-
-    public string? StringValue { get; set; }
-    public double? NumberValue { get; set; }
-    public string? ChoiceValue { get; set; }
-    public DateOnly? DateValue { get; set; }
+    public required string Value { get; set; }
 
 }
 
@@ -64,58 +54,14 @@ public class EmailContactPropertyService(
             .ToDictionaryAsync(ecp => ecp.Id, ecp => ecp.Choices);
 
         var newPropertyValues = contactProperties
-            .SelectMany<BulkAddEmailContactPropertyDTO, EmailContactPropertyValue>(p => {
-                if (
-                    p.PropertyValue.StringValue is not null
-                    && propertyTypes[p.PropertyId] == EmailContactPropertyType.String
-                ) {
-                    return contactIds.Select(c => new EmailContactStringPropertyValue {
-                        Tenant = userService.Tenant,
-                        ContactId = c,
-                        PropertyId = p.PropertyId,
-                        Value = p.PropertyValue.StringValue
-                    });
-                }
-
-                if (
-                    p.PropertyValue.NumberValue is not null
-                    && propertyTypes[p.PropertyId] == EmailContactPropertyType.Number
-                ) {
-                    return contactIds.Select(c => new EmailContactNumberPropertyValue {
-                        Tenant = userService.Tenant,
-                        ContactId = c,
-                        PropertyId = p.PropertyId,
-                        Value = (double)p.PropertyValue.NumberValue
-                    });
-                }
-
-                if (
-                    p.PropertyValue.ChoiceValue is not null
-                    && propertyTypes[p.PropertyId] == EmailContactPropertyType.Choice
-                    && propertyChoices[p.PropertyId].Contains(p.PropertyValue.ChoiceValue)
-                ) {
-                    return contactIds.Select(c => new EmailContactChoicePropertyValue {
-                        Tenant = userService.Tenant,
-                        ContactId = c,
-                        PropertyId = p.PropertyId,
-                        Value = p.PropertyValue.ChoiceValue
-                    });
-                }
-
-                if (
-                    p.PropertyValue.DateValue is not null
-                    && propertyTypes[p.PropertyId] == EmailContactPropertyType.Date
-                ) {
-                    return contactIds.Select(c => new EmailContactDatePropertyValue {
-                        Tenant = userService.Tenant,
-                        ContactId = c,
-                        PropertyId = p.PropertyId,
-                        Value = (DateOnly)p.PropertyValue.DateValue
-                    });
-                }
-
-                throw new InvalidPropertyValueSpecificationException();
-            })
+            .SelectMany(p =>
+                contactIds.Select(c => new EmailContactPropertyValue {
+                    Tenant = userService.Tenant,
+                    ContactId = c,
+                    PropertyId = p.PropertyId,
+                    Value = p.Value
+                })
+            )
             .ToList();
 
         db.EmailContactPropertyValues.AddRange(newPropertyValues);

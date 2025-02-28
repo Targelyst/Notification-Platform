@@ -7,7 +7,7 @@ using NotificationPlatform.Models.Email;
 namespace NotificationPlatform.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -146,11 +146,7 @@ namespace NotificationPlatform.Migrations
                 {
                     ContactId = table.Column<Guid>(type: "uuid", nullable: false),
                     PropertyId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Type = table.Column<EmailContactPropertyType>(type: "email_contact_property_type", nullable: false),
-                    EmailContactChoicePropertyValue_Value = table.Column<string>(type: "text", nullable: true),
-                    EmailContactDatePropertyValue_Value = table.Column<DateOnly>(type: "date", nullable: true),
-                    Value = table.Column<double>(type: "double precision", nullable: true),
-                    EmailContactStringPropertyValue_Value = table.Column<string>(type: "text", nullable: true),
+                    Value = table.Column<string>(type: "text", nullable: false),
                     Tenant = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -165,6 +161,45 @@ namespace NotificationPlatform.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_EmailContactPropertyValues_EmailContacts_ContactId",
+                        column: x => x.ContactId,
+                        principalTable: "EmailContacts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProxiedEvents",
+                columns: table => new
+                {
+                    Time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    Url = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<long>(type: "bigint", nullable: false),
+                    ContactId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.ForeignKey(
+                        name: "FK_ProxiedEvents_EmailContacts_ContactId",
+                        column: x => x.ContactId,
+                        principalTable: "EmailContacts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TrackedEvents",
+                columns: table => new
+                {
+                    Time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Tenant = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<long>(type: "bigint", nullable: false),
+                    ContactId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.ForeignKey(
+                        name: "FK_TrackedEvents_EmailContacts_ContactId",
                         column: x => x.ContactId,
                         principalTable: "EmailContacts",
                         principalColumn: "Id",
@@ -234,6 +269,16 @@ namespace NotificationPlatform.Migrations
                 table: "EmailTransportSenderAddresses",
                 columns: new[] { "TransportId", "Address" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProxiedEvents_ContactId",
+                table: "ProxiedEvents",
+                column: "ContactId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrackedEvents_ContactId",
+                table: "TrackedEvents",
+                column: "ContactId");
         }
 
         /// <inheritdoc />
@@ -249,13 +294,19 @@ namespace NotificationPlatform.Migrations
                 name: "EmailTransportSenderAddresses");
 
             migrationBuilder.DropTable(
+                name: "ProxiedEvents");
+
+            migrationBuilder.DropTable(
+                name: "TrackedEvents");
+
+            migrationBuilder.DropTable(
                 name: "EmailContactProperties");
 
             migrationBuilder.DropTable(
-                name: "EmailContacts");
+                name: "EmailTransports");
 
             migrationBuilder.DropTable(
-                name: "EmailTransports");
+                name: "EmailContacts");
 
             migrationBuilder.DropTable(
                 name: "EmailConfigurations");

@@ -1,10 +1,12 @@
 using System.Text.Json;
 using NotificationPlatform.Data;
-using NotificationPlatform.Exceptions;
 using NotificationPlatform.Models.Email;
 using NotificationPlatform.Services;
 
 namespace NotificationPlatform.Queries;
+
+public class EmailSegmentExpressionValidationException()
+    : Exception("The specified expression string is not a valid expression.");
 
 [MutationType]
 public static class EmailMutations {
@@ -96,7 +98,9 @@ public static class EmailMutations {
             return null;
         }
 
-        if (!EmailSegmentExpression.IsValidExpressionString(expression)) {
+        try {
+            EmailSegmentExpression.ValidateExpressionString(expression);
+        } catch (Exception) {
             throw new EmailSegmentExpressionValidationException();
         }
 
@@ -160,6 +164,38 @@ public static class EmailMutations {
         await db.SaveChangesAsync();
 
         return db.EmailTransportSenderAddresses.Where(a => a.Id == id);
+    }
+
+    [UseProjection]
+    [Error<EmailSegmentExpressionValidationException>]
+    public static async Task<IQueryable<EmailSegment>?> UpdateEmailSegmentAsync(
+        Guid id,
+        string name,
+        [GraphQLType<JsonType>]
+        string expression,
+        NotificationPlatformContext db
+    ) {
+        var emailSegment = await db.EmailSegments.FindAsync(id);
+
+        if (emailSegment is null) {
+            return null;
+        }
+
+        try {
+            EmailSegmentExpression.ValidateExpressionString(expression);
+        } catch (Exception) {
+            throw new EmailSegmentExpressionValidationException();
+        }
+
+        var expressionParsed = JsonSerializer.Deserialize<EmailSegmentExpression>(expression)
+            ?? throw new Exception("Could not parse expression to EmailSegmentExpression.");
+
+        emailSegment.Name = name;
+        emailSegment.Expression = expression;
+
+        await db.SaveChangesAsync();
+
+        return db.EmailSegments.Where(p => p.Id == id);
     }
 
     [UseMutationConvention(Disable = true)]

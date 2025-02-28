@@ -1,5 +1,12 @@
 using NotificationPlatform.Models.Email;
 
+using BinOps = NotificationPlatform.Models.Email.EmailSegmentExpressionBinaryOperator;
+using BinOp = NotificationPlatform.Models.Email.EmailSegmentBinaryOperationExpression;
+using LikeOp = NotificationPlatform.Models.Email.EmailSegmentLikeOperationExpression;
+using Lit = NotificationPlatform.Models.Email.EmailSegmentLiteralExpression;
+using CoVar = NotificationPlatform.Models.Email.EmailSegmentContactPropertyExpression;
+using CuVar = NotificationPlatform.Models.Email.EmailSegmentCustomPropertyExpression;
+
 namespace NotificationPlatform.Data;
 
 public class DevelopmentSeeder {
@@ -7,6 +14,20 @@ public class DevelopmentSeeder {
     public static void Seed(NotificationPlatformContext db) {
         var testProjectId = Guid.Parse("00000000-0000-0000-0000-000000000001");
         var testProject = db.Projects.Find(testProjectId);
+
+        EmailSegmentExpression testExpression = new BinOp(
+            BinOps.Or,
+            new BinOp(
+                BinOps.Eq,
+                new CoVar("EmailAddress"),
+                new Lit(EmailContactPropertyType.String, "kp@mail.com")
+            ),
+            new LikeOp(
+                true,
+                "peter%",
+                new CuVar("FirstName")
+            )
+        );
 
         if (testProject is null) {
             var result = db.Projects.Add(new() {
@@ -43,6 +64,13 @@ public class DevelopmentSeeder {
                             Tenant = "development-tenant",
                             EmailAddress = "cool.user@mail.com"
                         }
+                    ],
+                    Segments = [
+                        new() {
+                            Tenant = "development-tenant",
+                            Name = "Example Segment",
+                            Expression = testExpression.ToJson()
+                        }
                     ]
                 }
             });
@@ -52,31 +80,19 @@ public class DevelopmentSeeder {
 
                 foreach (var c in result.Entity.EmailConfiguration.Contacts) {
                     foreach (var p in result.Entity.EmailConfiguration.Properties) {
-                        EmailContactPropertyValue value = p switch {
-                            EmailContactStringProperty pp => new EmailContactStringPropertyValue() {
-                                Tenant = "development-tenant",
-                                PropertyId = pp.Id,
-                                Value = Guid.NewGuid().ToString("n")[..8]
-                            },
-                            EmailContactNumberProperty pp => new EmailContactNumberPropertyValue() {
-                                Tenant = "development-tenant",
-                                PropertyId = pp.Id,
-                                Value = rng.NextDouble()
-                            },
-                            EmailContactDateProperty pp => new EmailContactDatePropertyValue() {
-                                Tenant = "development-tenant",
-                                PropertyId = pp.Id,
-                                Value = DateOnly.FromDayNumber((int)rng.NextInt64(0, DateOnly.MaxValue.DayNumber))
-                            },
-                            EmailContactChoiceProperty pp => new EmailContactChoicePropertyValue() {
-                                Tenant = "development-tenant",
-                                PropertyId = pp.Id,
-                                Value = pp.Choices[rng.NextInt64(0, pp.Choices.Length)]
-                            },
+                        string value = p switch {
+                            EmailContactStringProperty pp => Guid.NewGuid().ToString("n")[..8],
+                            EmailContactNumberProperty pp => rng.NextDouble().ToString(),
+                            EmailContactDateProperty pp => DateOnly.FromDayNumber((int)rng.NextInt64(0, DateOnly.MaxValue.DayNumber)).ToPropertyString(),
+                            EmailContactChoiceProperty pp => pp.Choices[rng.NextInt64(0, pp.Choices.Length)],
                             _ => throw new NotImplementedException()
                         };
 
-                        c.Properties.Add(value);
+                        c.Properties.Add(new() {
+                            Tenant = "development-tenant",
+                            PropertyId = p.Id,
+                            Value = value
+                        });
                     }
                 }
             }
