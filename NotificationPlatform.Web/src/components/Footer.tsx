@@ -63,9 +63,9 @@ export function Footer() {
 
   return (
     <footer className="bg-impolar-bg text-impolar-bg-text">
-      <div className="px-2 pt-12 pb-8 sm:px-20">
+      <div className="px-4 pt-12 pb-8 sm:px-20">
         {/* Newsletter Section */}
-        <div className="mb-16 flex flex-col justify-between gap-8 md:flex-row border-b border-impolar-bg-highlight pb-4">
+        <div className="mb-16 flex flex-col justify-between gap-8 xl:flex-row border-b border-impolar-bg-highlight pb-4">
           <div className="max-w-md space-y-4 ">
             <h2 className="text-2xl font-bold text-impolar-bg-text">
               Sign up to our newsletter

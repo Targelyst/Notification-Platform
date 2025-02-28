@@ -85,6 +85,7 @@ export const Home = () => {
 
       {sections.map((section, sectionIdx) => (
         <Area
+
           onClick={() => console.log("Clicked")}
           key={sectionIdx}
           title={section.title}

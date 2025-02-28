@@ -99,7 +99,7 @@ export default function Dashboard() {
 							</div>
 						</div>
 
-						<main className="mb-22 mt-4 min-h-[calc(100vh-260px)]">
+						<main className="mb-22 min-h-[calc(100vh-260px)]">
 							<div key={location.key} className="animate-fadeIn m-w-full flex-1">
 								<Routes>
 									{pageUrlsArray.map((route) => (

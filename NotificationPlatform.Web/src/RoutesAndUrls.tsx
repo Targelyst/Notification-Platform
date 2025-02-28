@@ -4,6 +4,8 @@ import AnalyticsDashboard from "./pages/analytics/AnalyticsDashboard";
 import i18n from './i18n';
 import Segments from "./pages/audience/Segments";
 import { Contacts } from "./pages/contacts/Contacts";
+import { Audience } from "./pages/audience/Audience";
+import Content from "./pages/content/Content";
 
 interface PageUrlsProps {
     pageName: string;
@@ -28,6 +30,7 @@ export class RoutesAndUrls {
     public static readonly CONTENT: PageUrlsProps = {
         pageName: i18n.t('content'),
         urlPath: `/${i18n.t('content').toLowerCase()}`,
+        component: <Content />,
     };
 
     public static readonly CONTENT_TEMPLATES: PageUrlsProps = {
@@ -43,6 +46,7 @@ export class RoutesAndUrls {
     public static readonly AUDIENCE: PageUrlsProps = {
         pageName: i18n.t('audience'),
         urlPath: `/${i18n.t('audience').toLowerCase()}`,
+        component: <Audience />,
     };
 
     public static readonly AUDIENCE_CONTACTS: PageUrlsProps = {
