@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NotificationPlatform.Migrations
 {
     [DbContext(typeof(NotificationPlatformContext))]
-    [Migration("20250222163431_Initial")]
-    partial class Initial
+    [Migration("20250226094049_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -241,6 +241,50 @@ namespace NotificationPlatform.Migrations
                     b.ToTable("EmailTransportSenderAddresses");
                 });
 
+            modelBuilder.Entity("NotificationPlatform.Models.Email.Tracking.ProxiedEvent", b =>
+                {
+                    b.Property<Guid>("ContactId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Tenant")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("Value")
+                        .HasColumnType("bigint");
+
+                    b.HasIndex("ContactId");
+
+                    b.ToTable("ProxiedEvents");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.Tracking.TrackedEvent", b =>
+                {
+                    b.Property<Guid>("ContactId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Tenant")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("Value")
+                        .HasColumnType("bigint");
+
+                    b.HasIndex("ContactId");
+
+                    b.ToTable("TrackedEvents");
+                });
+
             modelBuilder.Entity("NotificationPlatform.Models.Project", b =>
                 {
                     b.Property<Guid>("Id")
@@ -378,6 +422,28 @@ namespace NotificationPlatform.Migrations
                         .IsRequired();
 
                     b.Navigation("Transport");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.Tracking.ProxiedEvent", b =>
+                {
+                    b.HasOne("NotificationPlatform.Models.Email.EmailContact", "Contact")
+                        .WithMany()
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contact");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.Tracking.TrackedEvent", b =>
+                {
+                    b.HasOne("NotificationPlatform.Models.Email.EmailContact", "Contact")
+                        .WithMany()
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contact");
                 });
 
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailConfiguration", b =>

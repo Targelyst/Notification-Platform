@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NotificationPlatform.Data;
 using NotificationPlatform.Models.Email;
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NotificationPlatform.Migrations
 {
     [DbContext(typeof(NotificationPlatformContext))]
-    partial class NotificationPlatformContextModelSnapshot : ModelSnapshot
+    [Migration("20250226094100_Create_Event_Hypertables")]
+    partial class Create_Event_Hypertables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

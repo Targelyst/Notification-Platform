@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NotificationPlatform.Models;
 using NotificationPlatform.Models.Email;
+using NotificationPlatform.Models.Email.Tracking;
 using NotificationPlatform.Services;
 
 namespace NotificationPlatform.Data;
@@ -33,6 +34,8 @@ public class NotificationPlatformContext : DbContext {
     public DbSet<EmailTransport> EmailTransports { get; set; }
     public DbSet<EmailTransportSenderAddress> EmailTransportSenderAddresses { get; set; }
     public DbSet<Project> Projects { get; set; }
+    public DbSet<ProxiedEvent> ProxiedEvents { get; set; }
+    public DbSet<TrackedEvent> TrackedEvents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         configureColumnEncryption(modelBuilder);
@@ -52,6 +55,8 @@ public class NotificationPlatformContext : DbContext {
         modelBuilder.Entity<EmailTransport>().HasQueryFilter(e => e.Tenant == userService.Tenant);
         modelBuilder.Entity<EmailTransportSenderAddress>().HasQueryFilter(e => e.Tenant == userService.Tenant);
         modelBuilder.Entity<Project>().HasQueryFilter(e => e.Tenant == userService.Tenant);
+        modelBuilder.Entity<ProxiedEvent>().HasQueryFilter(e => e.Tenant == userService.Tenant);
+        modelBuilder.Entity<TrackedEvent>().HasQueryFilter(e => e.Tenant == userService.Tenant);
     }
 
     public override void Dispose() {
