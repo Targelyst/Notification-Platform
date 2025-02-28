@@ -114,6 +114,11 @@ builder.Services
             opt.MaxPageSize = 100;
         }
     )
+    .ModifyCostOptions(
+        opt => {
+            opt.MaxFieldCost = 6000;
+        }
+    )
     .ModifyOptions(
         opt => {
             opt.EnableOneOf = true;
