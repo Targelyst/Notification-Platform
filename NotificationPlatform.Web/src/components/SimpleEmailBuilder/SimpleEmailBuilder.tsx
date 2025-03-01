@@ -258,10 +258,19 @@ const SimpleEmailBuilder: FC = () => {
                 .join("")}</mj-section>`;
             } else if (block.type === "section") {
               updatedMjml = `<mj-section background-color="${block.styles.backgroundColor || '#ffffff'}" padding="${block.styles.padding || '10px'}">
-                ${newChildren[0].map(child => child.mjml).join("")}
+                <mj-column>
+                  ${newChildren[0].map(child => {
+                    // Special handling for columns inside sections
+                    if (child.type === 'columns') {
+                      // Remove outer mj-section tags for nested columns
+                      return child.mjml.replace(/^<mj-section[^>]*>/, '')
+                                      .replace(/<\/mj-section>$/, '');
+                    }
+                    return child.mjml;
+                  }).join("")}
+                </mj-column>
               </mj-section>`;
             }
-  
             return {
               ...block,
               children: newChildren,
