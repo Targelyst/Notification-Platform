@@ -1,87 +1,36 @@
-// components/SimpleEmailBuilder/ColumnComponent.tsx
+// components/SimpleEmailBuilder/Components/ColumnComponent.tsx
 import React, { useRef, useState } from "react";
-import ContextMenu from "../ContextMenu";
+import { useDrag, useDrop } from "react-dnd";
+import { Block, BlockType, ContainerComponentProps, DragItem } from "../types";
+import { registerComponent } from "../ComponentRegistry";
 import { TrashIcon, DragHandleIcon, AddButton } from "../SharedIcons";
 import TextComponent from "./TextComponent";
 import ImageComponent from "./ImageComponent";
-import { useDrag, useDrop } from "react-dnd";
 
-export type BlockType = "text" | "image" | "columns";
-
-export interface Block {
-  id: string;
-  type: BlockType;
-  content: string;
-  mjml: string;
-  styles: Record<string, string>;
-  children?: Block[][];
-}
-
-export interface DragItem {
-  id: string;
-  index: number;
-  parentId?: string;
-  columnIndex?: number;
-  type?: BlockType;
-}
-
-export const useDraggableBlock = (
-  blockId: string,
-  index: number,
-  moveBlock: (dragIndex: number, hoverIndex: number) => void,
-  blockType: BlockType
-) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const [{ isDragging }, drag] = useDrag({
-    type: blockType,
-    item: { id: blockId, index },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-
-  const [, drop] = useDrop<DragItem>({
-    accept: blockType,
-    hover(item) {
-      if (!ref.current) return;
-      const dragIndex = item.index;
-      const hoverIndex = index;
-      if (dragIndex === hoverIndex) return;
-      moveBlock(dragIndex, hoverIndex);
-      item.index = hoverIndex;
-    },
-  });
-
-  drag(drop(ref));
-
-  return { ref, isDragging };
-};
-
-
-export const useDraggableChildBlock = (
+const useDraggableChildBlock = (
   parentId: string,
-  columnIndex: number,
+  containerIndex: number,
   blockId: string,
   index: number,
   moveChildBlock: (
-    columnIndex: number,
+    containerIndex: number,
     dragIndex: number,
     hoverIndex: number
   ) => void,
-  moveChildBlockBetweenColumns: ( // Make sure this parameter is properly passed
+  moveChildBlockBetweenContainers: (
     sourceParentId: string,
-    sourceColumnIndex: number,
+    sourceContainerIndex: number,
     blockId: string,
     targetParentId: string,
-    targetColumnIndex: number,
-    insertIndex: number
+    targetContainerIndex: number,
+    insertIndex?: number
   ) => void
 ) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const [{ isDragging }, drag] = useDrag<DragItem, unknown, { isDragging: boolean }>({
     type: "child-block",
-    item: { id: blockId, index, parentId, columnIndex, type: "child-block" },
+    item: { id: blockId, index, parentId, containerIndex, type: "child-block" },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -104,36 +53,36 @@ export const useDraggableChildBlock = (
       const targetIndex = isBeforeHovered ? index : index + 1;
 
       // If from same column
-      if (item.columnIndex === columnIndex && item.parentId === parentId) {
+      if (item.containerIndex === containerIndex && item.parentId === parentId) {
         const dragIndex = item.index;
         const hoverIndex = index;
 
         if (dragIndex === hoverIndex) return;
 
         // Don't replace items with themselves
-        if (dragIndex === hoverIndex && item.columnIndex === columnIndex) return;
+        if (dragIndex === hoverIndex && item.containerIndex === containerIndex) return;
 
         // Only perform the move when cursor crosses half of the item
         if (dragIndex < hoverIndex && !isBeforeHovered) return; // Dragging downward
         if (dragIndex > hoverIndex && isBeforeHovered) return; // Dragging upward
 
-        moveChildBlock(columnIndex, dragIndex, hoverIndex);
+        moveChildBlock(containerIndex, dragIndex, hoverIndex);
         item.index = hoverIndex;
       }
       // If from different column - directly rearrange here instead of waiting for drop
       else {
-        moveChildBlockBetweenColumns(
+        moveChildBlockBetweenContainers(
           item.parentId!,
-          item.columnIndex!,
+          item.containerIndex!,
           item.id,
           parentId,
-          columnIndex,
+          containerIndex,
           targetIndex
         );
 
         // Update item's position information
         item.parentId = parentId;
-        item.columnIndex = columnIndex;
+        item.containerIndex = containerIndex;
         item.index = targetIndex;
       }
     },
@@ -143,50 +92,130 @@ export const useDraggableChildBlock = (
   return { ref, isDragging };
 };
 
-interface ColumnComponentProps {
-  block: Block;
-  index: number;
-  moveBlock: (dragIndex: number, hoverIndex: number) => void;
-  updateBlock: (id: string, updates: Partial<Block>) => void;
-  deleteBlock: (id: string) => void;
-  addBlockToColumn: (
-    parentId: string,
+interface DraggableChildBlockProps {
+  child: Block;
+  childIndex: number;
+  columnIndex: number;
+  parentId: string;
+  moveChildBlock: (
     columnIndex: number,
-    type: BlockType
+    dragIndex: number,
+    hoverIndex: number
   ) => void;
-  moveBlockToColumn: (blockId: string, parentId: string, columnIndex: number) => void;
-  moveChildBlockBetweenColumns: (
+  updateChildBlock: (id: string, updates: Partial<Block>) => void;
+  deleteChildBlock: (id: string) => void;
+  moveChildBlockBetweenContainers: (
     sourceParentId: string,
-    sourceColumnIndex: number,
+    sourceContainerIndex: number,
     blockId: string,
     targetParentId: string,
-    targetColumnIndex: number
+    targetContainerIndex: number,
+    insertIndex?: number
   ) => void;
 }
 
-const ColumnComponent: React.FC<ColumnComponentProps> = ({
+const DraggableChildBlock: React.FC<DraggableChildBlockProps> = ({
+  child,
+  childIndex,
+  columnIndex,
+  parentId,
+  moveChildBlock,
+  updateChildBlock,
+  deleteChildBlock,
+  moveChildBlockBetweenContainers,
+}) => {
+  const { ref, isDragging } = useDraggableChildBlock(
+    parentId,
+    columnIndex,
+    child.id,
+    childIndex,
+    moveChildBlock,
+    moveChildBlockBetweenContainers
+  );
+
+  const commonProps = {
+    block: child,
+    index: childIndex,
+    updateBlock: updateChildBlock,
+    deleteBlock: deleteChildBlock,
+    addBlockBelow: () => { },
+  };
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        opacity: isDragging ? 0.5 : 1,
+        border: '1px solid blue',  // Debug outline
+        margin: '4px'
+      }}
+    >
+      <small style={{ color: 'green' }}>
+        ID: {child.id.substring(0, 4)}... Col: {columnIndex}, Idx: {childIndex}
+      </small>
+      {child.type === "text" ? (
+        <TextComponent {...commonProps} />
+      ) : (
+        <ImageComponent {...commonProps} />
+      )}
+    </div>
+  );
+};
+
+const ColumnComponent: React.FC<ContainerComponentProps> = ({
   block,
   index,
   moveBlock,
   updateBlock,
   deleteBlock,
-  addBlockToColumn,
-  moveBlockToColumn,
-  moveChildBlockBetweenColumns,
+  addBlockToContainer,
+  moveBlockToContainer,
+  moveChildBlockBetweenContainers,
 }) => {
-  const { ref, isDragging } = useDraggableBlock(block.id, index, moveBlock, block.type);
+  const ref = useRef<HTMLDivElement>(null);
   const [selectedColumn, setSelectedColumn] = useState<number | null>(null);
 
+  // Set up drag and drop
+  const [{ isDragging }, drag] = useDrag({
+    type: block.type,
+    item: { id: block.id, index, type: block.type },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  const [, drop] = useDrop<DragItem>({
+    accept: block.type,
+    hover(item, monitor) {
+      if (!ref.current) return;
+      const dragIndex = item.index;
+      const hoverIndex = index;
+
+      // Don't replace items with themselves
+      if (dragIndex === hoverIndex) return;
+
+      // Time to actually perform the action
+      if (moveBlock) {
+        moveBlock(dragIndex, hoverIndex);
+      }
+
+      // Note: we're mutating the monitor item here!
+      item.index = hoverIndex;
+    },
+  });
+
+  drag(drop(ref));
+
   const moveChildBlock = (
-    columnIndex: number,
+    containerIndex: number,
     dragIndex: number,
     hoverIndex: number
   ) => {
     const newChildren = [...(block.children || [])];
-    const columnChildren = [...newChildren[columnIndex]];
+    const columnChildren = [...newChildren[containerIndex]];
     const [draggedItem] = columnChildren.splice(dragIndex, 1);
     columnChildren.splice(hoverIndex, 0, draggedItem);
-    newChildren[columnIndex] = columnChildren;
+    newChildren[containerIndex] = columnChildren;
     updateBlock(block.id, { children: newChildren });
   };
 
@@ -220,15 +249,10 @@ const ColumnComponent: React.FC<ColumnComponentProps> = ({
 
               // For child-block items
               if (item.type === "child-block") {
-                // IMPORTANT: Don't call moveChildBlockBetweenColumns here!
                 // Only perform visual feedback during hover, not actual movement
-
-                // If from the same column, handle visual positioning
-                if (item.columnIndex === colIndex && item.parentId === block.id) {
+                if (item.containerIndex === colIndex && item.parentId === block.id) {
                   // Handle same-column hovering (already implemented elsewhere)
                 }
-                // Save target information for the drop handler
-                // but don't perform actual movement here
               }
             },
             drop: (item, monitor) => {
@@ -238,10 +262,10 @@ const ColumnComponent: React.FC<ColumnComponentProps> = ({
               const itemType = monitor.getItemType();
               if (itemType === "child-block") {
                 // Only perform actual movement during drop
-                if (item.parentId !== block.id || item.columnIndex !== colIndex) {
-                  moveChildBlockBetweenColumns(
+                if (item.parentId !== block.id || item.containerIndex !== colIndex) {
+                  moveChildBlockBetweenContainers(
                     item.parentId!,
-                    item.columnIndex!,
+                    item.containerIndex!,
                     item.id,
                     block.id,
                     colIndex
@@ -249,7 +273,7 @@ const ColumnComponent: React.FC<ColumnComponentProps> = ({
                   return { handled: true };
                 }
               } else {
-                moveBlockToColumn(item.id, block.id, colIndex);
+                moveBlockToContainer(item.id, block.id, colIndex);
                 return { handled: true };
               }
             },
@@ -279,7 +303,7 @@ const ColumnComponent: React.FC<ColumnComponentProps> = ({
                   moveChildBlock={moveChildBlock}
                   updateChildBlock={updateChildBlock}
                   deleteChildBlock={deleteChildBlock}
-                  moveChildBlockBetweenColumns={moveChildBlockBetweenColumns}
+                  moveChildBlockBetweenContainers={moveChildBlockBetweenContainers}
                 />
               ))}
 
@@ -287,7 +311,7 @@ const ColumnComponent: React.FC<ColumnComponentProps> = ({
                 className="absolute"
                 onClick={(e) => {
                   e.stopPropagation();
-                  addBlockToColumn(block.id, colIndex, "text");
+                  addBlockToContainer(block.id, colIndex, "text");
                 }}
               />
             </div>
@@ -307,74 +331,19 @@ const ColumnComponent: React.FC<ColumnComponentProps> = ({
   );
 };
 
-interface DraggableChildBlockProps {
-  child: Block;
-  childIndex: number;
-  columnIndex: number;
-  parentId: string;
-  moveChildBlock: (
-    columnIndex: number,
-    dragIndex: number,
-    hoverIndex: number
-  ) => void;
-  updateChildBlock: (id: string, updates: Partial<Block>) => void;
-  deleteChildBlock: (id: string) => void;
-  moveChildBlockBetweenColumns: ( // Add this prop
-    sourceParentId: string,
-    sourceColumnIndex: number,
-    blockId: string,
-    targetParentId: string,
-    targetColumnIndex: number,
-    insertIndex: number
-  ) => void;
-}
-
-const DraggableChildBlock: React.FC<DraggableChildBlockProps> = ({
-  child,
-  childIndex,
-  columnIndex,
-  parentId,
-  moveChildBlock,
-  updateChildBlock,
-  deleteChildBlock,
-  moveChildBlockBetweenColumns, // Make sure this prop is passed
-}) => {
-  const { ref, isDragging } = useDraggableChildBlock(
-    parentId,
-    columnIndex,
-    child.id,
-    childIndex,
-    moveChildBlock,
-    moveChildBlockBetweenColumns // Pass it to the hook
-  );
-
-  const commonProps = {
-    block: child,
-    index: childIndex,
-    updateBlock: updateChildBlock,
-    deleteBlock: deleteChildBlock,
-    addBlockBelow: () => { },
-  };
-
-  return (
-    <div
-      ref={ref}
-      style={{
-        opacity: isDragging ? 0.5 : 1,
-        border: '1px solid blue',  // Debug outline
-        margin: '4px'
-      }}
-    >
-      <small style={{ color: 'green' }}>
-        ID: {child.id.substring(0, 4)}... Col: {columnIndex}, Idx: {childIndex}
-      </small>
-      {child.type === "text" ? (
-        <TextComponent {...commonProps} />
-      ) : (
-        <ImageComponent {...commonProps} />
-      )}
-    </div>
-  );
-};
+// Register the component with the ComponentRegistry
+registerComponent(
+  'columns',
+  ColumnComponent,
+  (content, styles) => {
+    return `<mj-section>
+      <mj-column></mj-column>
+      <mj-column></mj-column>
+    </mj-section>`;
+  },
+  { width: "100%" },
+  "Column Layout",
+  true // This is a container component
+);
 
 export default ColumnComponent;

@@ -1,12 +1,16 @@
 // components/SimpleEmailBuilder/SimpleEmailBuilder.tsx
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import type { FC } from "react";
 import { DndProvider, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import mjml2html from "mjml-browser";
-import ColumnComponent, { Block, BlockType, DragItem } from "./Components/ColumnComponent";
-import ImageComponent from "./Components/ImageComponent";
-import TextComponent from "./Components/TextComponent";
+import { Block, BlockType, DragItem } from "./types";
+import { createNewBlock, DynamicBlockComponent } from "./ComponentRegistry";
+
+// Import components to ensure they register with the registry
+import "./Components/TextComponent";
+import "./Components/SectionComponent";
+import "./Components/ColumnComponent";
 
 const SimpleEmailBuilder: FC = () => {
   const [blocks, setBlocks] = useState<Block[]>([]);
@@ -20,15 +24,12 @@ const SimpleEmailBuilder: FC = () => {
         ? '<mj-section><mj-column><mj-text>Add content to preview</mj-text></mj-column></mj-section>'
         : blocks
             .map((block) => {
-              if (block.type === "columns" && block.children) {
-                return `<mj-section>${block.children
-                  .map(
-                    (column) =>
-                      `<mj-column>${column.map((child) => child.mjml).join("")}</mj-column>`
-                  )
-                  .join("")}</mj-section>`;
+              if ((block.type === "columns" || block.type === "section") && block.children) {
+                // Container components already have their MJML properly formatted
+                return block.mjml;
               }
 
+              // Non-container components need wrapping
               const wrappedMjml = block.mjml.startsWith("<mj-section")
                 ? block.mjml
                 : `<mj-section><mj-column>${block.mjml}</mj-column></mj-section>`;
@@ -71,7 +72,7 @@ const SimpleEmailBuilder: FC = () => {
   }, [blocks, generateFullMJML]);
 
   const moveChildBlockToMainBlocks = useCallback(
-    (parentId: string, columnIndex: number, blockId: string) => {
+    (parentId: string, containerIndex: number, blockId: string) => {
       setBlocks((prevBlocks) => {
         const newBlocks = [...prevBlocks];
 
@@ -80,25 +81,30 @@ const SimpleEmailBuilder: FC = () => {
         if (parentBlockIndex === -1) return prevBlocks;
 
         const parentBlock = newBlocks[parentBlockIndex];
-
         if (!parentBlock.children) return prevBlocks;
 
-        // Remove the block from its column
-        const columnChildren = [...parentBlock.children[columnIndex]];
-        const blockIndex = columnChildren.findIndex((b) => b.id === blockId);
+        // Remove the block from its container
+        const containerChildren = [...parentBlock.children[containerIndex]];
+        const blockIndex = containerChildren.findIndex((b) => b.id === blockId);
         if (blockIndex === -1) return prevBlocks;
 
-        const [movedBlock] = columnChildren.splice(blockIndex, 1);
+        const [movedBlock] = containerChildren.splice(blockIndex, 1);
 
         // Update parent's children
-        parentBlock.children[columnIndex] = columnChildren;
+        parentBlock.children[containerIndex] = containerChildren;
 
         // Update parent's MJML
-        parentBlock.mjml = `<mj-section>${parentBlock.children
-          .map(
-            (column) => `<mj-column>${column.map((c) => c.mjml).join("")}</mj-column>`
-          )
-          .join("")}</mj-section>`;
+        if (parentBlock.type === "columns") {
+          parentBlock.mjml = `<mj-section>${parentBlock.children
+            .map(
+              (column) => `<mj-column>${column.map((c) => c.mjml).join("")}</mj-column>`
+            )
+            .join("")}</mj-section>`;
+        } else if (parentBlock.type === "section") {
+          parentBlock.mjml = `<mj-section background-color="${parentBlock.styles.backgroundColor || '#ffffff'}" padding="${parentBlock.styles.padding || '10px'}">
+            ${parentBlock.children[0].map(c => c.mjml).join("")}
+          </mj-section>`;
+        }
 
         // Wrap the moved block's MJML appropriately
         const wrappedMjml = `<mj-section><mj-column>${movedBlock.mjml}</mj-column></mj-section>`;
@@ -118,14 +124,14 @@ const SimpleEmailBuilder: FC = () => {
     []
   );
 
-  const moveChildBlockBetweenColumns = useCallback(
+  const moveChildBlockBetweenContainers = useCallback(
     (
       sourceParentId: string,
-      sourceColumnIndex: number,
+      sourceContainerIndex: number,
       blockId: string,
       targetParentId: string,
-      targetColumnIndex: number,
-      insertIndex: number = -1 // New parameter
+      targetContainerIndex: number,
+      insertIndex: number = -1
     ) => {
       setBlocks((prevBlocks) => {
         const newBlocks = [...prevBlocks];
@@ -134,37 +140,49 @@ const SimpleEmailBuilder: FC = () => {
         const sourceParent = newBlocks.find((b) => b.id === sourceParentId);
         if (!sourceParent?.children) return prevBlocks;
         
-        const sourceColumn = [...sourceParent.children[sourceColumnIndex]];
-        const blockIndex = sourceColumn.findIndex((b) => b.id === blockId);
+        const sourceContainer = [...sourceParent.children[sourceContainerIndex]];
+        const blockIndex = sourceContainer.findIndex((b) => b.id === blockId);
         if (blockIndex === -1) return prevBlocks;
         
-        const [movedBlock] = sourceColumn.splice(blockIndex, 1);
-        sourceParent.children[sourceColumnIndex] = sourceColumn;
+        const [movedBlock] = sourceContainer.splice(blockIndex, 1);
+        sourceParent.children[sourceContainerIndex] = sourceContainer;
         
-        // Update source parent MJML
-        sourceParent.mjml = `<mj-section>${sourceParent.children
-          .map((col) => `<mj-column>${col.map((c) => c.mjml).join("")}</mj-column>`)
-          .join("")}</mj-section>`;
+        // Update source parent MJML based on its type
+        if (sourceParent.type === "columns") {
+          sourceParent.mjml = `<mj-section>${sourceParent.children
+            .map((col) => `<mj-column>${col.map((c) => c.mjml).join("")}</mj-column>`)
+            .join("")}</mj-section>`;
+        } else if (sourceParent.type === "section") {
+          sourceParent.mjml = `<mj-section background-color="${sourceParent.styles.backgroundColor || '#ffffff'}" padding="${sourceParent.styles.padding || '10px'}">
+            ${sourceParent.children[0].map(c => c.mjml).join("")}
+          </mj-section>`;
+        }
         
         // Find target parent and add the block
         const targetParent = newBlocks.find((b) => b.id === targetParentId);
         if (!targetParent?.children) return prevBlocks;
         
-        const targetColumn = [...(targetParent.children[targetColumnIndex] || [])];
+        const targetContainer = [...(targetParent.children[targetContainerIndex] || [])];
         
         // Add at specific position if provided, otherwise append to end
-        if (insertIndex >= 0 && insertIndex <= targetColumn.length) {
-          targetColumn.splice(insertIndex, 0, movedBlock);
+        if (insertIndex >= 0 && insertIndex <= targetContainer.length) {
+          targetContainer.splice(insertIndex, 0, movedBlock);
         } else {
-          targetColumn.push(movedBlock);
+          targetContainer.push(movedBlock);
         }
         
-        targetParent.children[targetColumnIndex] = targetColumn;
+        targetParent.children[targetContainerIndex] = targetContainer;
         
         // Update target parent MJML
-        targetParent.mjml = `<mj-section>${targetParent.children
-          .map((col) => `<mj-column>${col.map((c) => c.mjml).join("")}</mj-column>`)
-          .join("")}</mj-section>`;
+        if (targetParent.type === "columns") {
+          targetParent.mjml = `<mj-section>${targetParent.children
+            .map((col) => `<mj-column>${col.map((c) => c.mjml).join("")}</mj-column>`)
+            .join("")}</mj-section>`;
+        } else if (targetParent.type === "section") {
+          targetParent.mjml = `<mj-section background-color="${targetParent.styles.backgroundColor || '#ffffff'}" padding="${targetParent.styles.padding || '10px'}">
+            ${targetParent.children[0].map(c => c.mjml).join("")}
+          </mj-section>`;
+        }
         
         return newBlocks;
       });
@@ -190,8 +208,8 @@ const SimpleEmailBuilder: FC = () => {
     });
   }, []);
 
-  const moveBlockToColumn = useCallback(
-    (blockId: string, parentId: string, columnIndex: number, insertIndex: number = -1) => {
+  const moveBlockToContainer = useCallback(
+    (blockId: string, parentId: string, containerIndex: number, insertIndex: number = -1) => {
       setBlocks((prev) => {
         // Find the block to move
         const blockIndex = prev.findIndex((b) => b.id === blockId);
@@ -203,8 +221,8 @@ const SimpleEmailBuilder: FC = () => {
         const newBlocks = [...prev];
         newBlocks.splice(blockIndex, 1);
   
-        // Now add the block to the specified column in the specified parent block
-        newBlocks.forEach((block) => {
+        // Now add the block to the specified container in the parent
+        return newBlocks.map((block) => {
           if (block.id === parentId && block.children) {
             // Remove wrapping from blockToMove
             const unwrappedBlock = {
@@ -213,16 +231,14 @@ const SimpleEmailBuilder: FC = () => {
             };
   
             const newChildren = block.children.map((col, idx) => {
-              if (idx === columnIndex) {
+              if (idx === containerIndex) {
                 if (insertIndex >= 0 && insertIndex <= col.length) {
-                  // Insert at specific position
                   return [
                     ...col.slice(0, insertIndex),
                     unwrappedBlock,
                     ...col.slice(insertIndex)
                   ];
                 } else {
-                  // Default behavior - append to end
                   return [...col, unwrappedBlock];
                 }
               } else {
@@ -230,29 +246,35 @@ const SimpleEmailBuilder: FC = () => {
               }
             });
   
-            // Update the block's mjml
-            const updatedBlock = {
-              ...block,
-              children: newChildren,
-              mjml: `<mj-section>${newChildren
+            // Update the block's mjml based on its type
+            let updatedMjml = '';
+            
+            if (block.type === "columns") {
+              updatedMjml = `<mj-section>${newChildren
                 .map(
                   (column) =>
                     `<mj-column>${column.map((child) => child.mjml).join("")}</mj-column>`
                 )
-                .join("")}</mj-section>`,
+                .join("")}</mj-section>`;
+            } else if (block.type === "section") {
+              updatedMjml = `<mj-section background-color="${block.styles.backgroundColor || '#ffffff'}" padding="${block.styles.padding || '10px'}">
+                ${newChildren[0].map(child => child.mjml).join("")}
+              </mj-section>`;
+            }
+  
+            return {
+              ...block,
+              children: newChildren,
+              mjml: updatedMjml,
             };
-  
-            // Replace the block
-            const blockIdx = newBlocks.findIndex((b) => b.id === block.id);
-            newBlocks[blockIdx] = updatedBlock;
           }
+          return block;
         });
-  
-        return newBlocks;
       });
     },
     []
   );
+
   // Helper function to remove wrapping
   function stripMjmlWrapping(mjml: string): string {
     // Remove '<mj-section><mj-column>' and '</mj-column></mj-section>' from the mjml
@@ -270,16 +292,26 @@ const SimpleEmailBuilder: FC = () => {
         .map((block) => {
           if (block?.id === id) {
             const updated = { ...block, ...updates };
-            if (updated.type === "columns" && updated.children) {
-              return {
-                ...updated,
-                mjml: `<mj-section>${updated.children
-                  .map(
-                    (column) =>
-                      `<mj-column>${column.map((child) => child?.mjml || "").join("")}</mj-column>`
-                  )
-                  .join("")}</mj-section>`,
-              };
+            // If MJML wasn't explicitly updated, we'll recalculate it
+            if (!updates.mjml) {
+              if (updated.type === "columns" && updated.children) {
+                return {
+                  ...updated,
+                  mjml: `<mj-section>${updated.children
+                    .map(
+                      (column) =>
+                        `<mj-column>${column.map((child) => child?.mjml || "").join("")}</mj-column>`
+                    )
+                    .join("")}</mj-section>`,
+                };
+              } else if (updated.type === "section" && updated.children) {
+                return {
+                  ...updated,
+                  mjml: `<mj-section background-color="${updated.styles.backgroundColor || '#ffffff'}" padding="${updated.styles.padding || '10px'}">
+                    ${updated.children[0].map(child => child?.mjml || "").join("")}
+                  </mj-section>`,
+                };
+              }
             }
             return updated;
           }
@@ -290,88 +322,70 @@ const SimpleEmailBuilder: FC = () => {
   }, []);
 
   const addBlockBelow = (index: number, type: BlockType) => {
-    let newBlock: Block;
-
-    if (type === "columns") {
-      newBlock = {
-        id: Date.now().toString(),
-        type: "columns",
-        content: "",
-        mjml:
-          "<mj-section><mj-column></mj-column><mj-column></mj-column></mj-section>",
-        styles: {},
-        children: [[], []],
-      };
-    } else {
-      const defaultStyles: Record<string, string> =
-        type === "text"
-          ? { fontSize: "14px", color: "#000000", width: "100%" }
-          : { width: "100%", fontSize: "14px", color: "#000000" };
-
-      newBlock = {
-        id: Date.now().toString(),
-        type,
-        content:
-          type === "text" ? "New text" : "https://via.placeholder.com/350x150",
-        mjml:
-          type === "text"
-            ? `<mj-section><mj-column><mj-text font-size="${defaultStyles.fontSize}" color="${defaultStyles.color}">New text</mj-text></mj-column></mj-section>`
-            : `<mj-section padding="10px 0"><mj-column><mj-image src="https://via.placeholder.com/350x150" width="${defaultStyles.width}" /></mj-column></mj-section>`,
-        styles: defaultStyles,
-      };
+    try {
+      const newBlock = createNewBlock(type);
+      setBlocks((prev) =>
+        [
+          ...prev.slice(0, index + 1),
+          newBlock,
+          ...prev.slice(index + 1),
+        ].filter((block) => !!block)
+      );
+    } catch (err) {
+      console.error("Failed to create block:", err);
+      setError(`Failed to create ${type} block: ${err instanceof Error ? err.message : String(err)}`);
     }
-
-    setBlocks((prev) =>
-      [
-        ...prev.slice(0, index + 1),
-        newBlock,
-        ...prev.slice(index + 1),
-      ].filter((block) => !!block)
-    );
   };
 
-  const addBlockToColumn = useCallback(
-    (parentId: string, columnIndex: number, type: BlockType) => {
-      setBlocks((prev) =>
-        prev
-          .map((block) => {
-            if (block?.id === parentId && block.children) {
-              const newChildBlock: Block = {
-                id: Date.now().toString(),
-                type,
-                content:
-                  type === "text"
-                    ? "New text"
-                    : "https://via.placeholder.com/350x150",
-                styles:
-                  type === "text"
-                    ? { fontSize: "14px", color: "#000000", width: "100%" }
-                    : { width: "100%", fontSize: "14px", color: "#000000" },
-                mjml:
-                  type === "text"
-                    ? '<mj-text>New text</mj-text>'
-                    : '<mj-image src="https://via.placeholder.com/350x150" />',
-              };
-
-              const newChildren = block.children.map((col, idx) =>
-                idx === columnIndex ? [...col, newChildBlock] : col
-              );
-
-              return {
-                ...block,
-                children: newChildren,
-                mjml: `<mj-section>${newChildren
-                  .map(
-                    (column) =>
-                      `<mj-column>${column.map((child) => child.mjml).join("")}</mj-column>`
-                  )
-                  .join("")}</mj-section>`,
-              };
-            }
-            return block;
-          })
-          .filter((block) => !!block)
-      );
+  const addBlockToContainer = useCallback(
+    (parentId: string, containerIndex: number, type: BlockType) => {
+      try {
+        const newChildBlock = createNewBlock(type);
+        
+        setBlocks((prev) =>
+          prev
+            .map((block) => {
+              if (block?.id === parentId && block.children) {
+                const newChildren = block.children.map((col, idx) =>
+                  idx === containerIndex ? [...col, newChildBlock] : col
+                );
+  
+                let updatedMjml = '';
+                if (block.type === "columns") {
+                  updatedMjml = `<mj-section>${newChildren
+                    .map(
+                      (column) =>
+                        `<mj-column>${column.map((child) => child.mjml).join("")}</mj-column>`
+                    )
+                    .join("")}</mj-section>`;
+                } else if (block.type === "section") {
+                  updatedMjml = `<mj-section background-color="${block.styles.backgroundColor || '#ffffff'}" padding="${block.styles.padding || '10px'}">
+                    ${newChildren[0].map(child => {
+                      // Special handling for columns inside sections
+                      if (child.type === 'columns') {
+                        // Remove outer mj-section tags for nested columns
+                        return child.mjml.replace(/^<mj-section[^>]*>/, '')
+                                        .replace(/<\/mj-section>$/, '');
+                      }
+                      return child.mjml;
+                    }).join("")}
+                  </mj-section>`;
+                }
+  
+                return {
+                  ...block,
+                  children: newChildren,
+                  mjml: updatedMjml,
+                };
+              }
+              return block;
+            })
+            .filter((block) => !!block)
+        );
+      } catch (err) {
+        console.error("Failed to add block to container:", err);
+        setError(`Failed to add ${type} block to container: ${err instanceof Error ? err.message : String(err)}`);
+      }
     },
     []
   );
@@ -398,7 +412,7 @@ const SimpleEmailBuilder: FC = () => {
 
     if (
       typeof block.id !== "string" ||
-      !["text", "image", "columns"].includes(block.type) ||
+      !["text", "image", "columns", "section"].includes(block.type) ||
       typeof block.content !== "string" ||
       typeof block.mjml !== "string" ||
       typeof block.styles !== "object"
@@ -406,15 +420,15 @@ const SimpleEmailBuilder: FC = () => {
       return false;
     }
 
-    if (block.type === "columns" && block.children) {
-      const isValidColumns =
+    if ((block.type === "columns" || block.type === "section") && block.children) {
+      const isValidChildren =
         Array.isArray(block.children) &&
         block.children.every(
           (column: Block[]) =>
             Array.isArray(column) &&
             column.every((child: Block) => isValidBlock(child))
         );
-      if (!isValidColumns) return false;
+      if (!isValidChildren) return false;
     }
 
     return true;
@@ -429,7 +443,7 @@ const SimpleEmailBuilder: FC = () => {
       if (didDrop) return;
       
       if (item.type === "child-block") {
-        moveChildBlockToMainBlocks(item.parentId!, item.columnIndex!, item.id);
+        moveChildBlockToMainBlocks(item.parentId!, item.containerIndex!, item.id);
       }
     },
   });
@@ -473,51 +487,19 @@ const SimpleEmailBuilder: FC = () => {
                       key={block.id}
                       className="transition-item animate-enter hover:bg-gray-50 rounded-lg relative"
                     >
-                      {block.type === "columns" ? (
-                        <ColumnComponent
-                          block={block}
-                          index={index}
-                          moveBlock={moveBlock}
-                          updateBlock={updateBlock}
-                          deleteBlock={(id) => {
-                            const deletedBlock = blocks.find((b) => b?.id === id);
-                            if (deletedBlock) {
-                              setBlocks((prev) => prev.filter((b) => b?.id !== id));
-                            }
-                          }}
-                          addBlockToColumn={addBlockToColumn}
-                          moveBlockToColumn={moveBlockToColumn}
-                          moveChildBlockBetweenColumns={moveChildBlockBetweenColumns}
-                        />
-                      ) : block.type === "text" ? (
-                        <TextComponent
-                          block={block}
-                          index={index}
-                          moveBlock={moveBlock}
-                          updateBlock={updateBlock}
-                          deleteBlock={(id) => {
-                            const deletedBlock = blocks.find((b) => b?.id === id);
-                            if (deletedBlock) {
-                              setBlocks((prev) => prev.filter((b) => b?.id !== id));
-                            }
-                          }}
-                          addBlockBelow={addBlockBelow}
-                        />
-                      ) : (
-                        <ImageComponent
-                          block={block}
-                          index={index}
-                          moveBlock={moveBlock}
-                          updateBlock={updateBlock}
-                          deleteBlock={(id) => {
-                            const deletedBlock = blocks.find((b) => b?.id === id);
-                            if (deletedBlock) {
-                              setBlocks((prev) => prev.filter((b) => b?.id !== id));
-                            }
-                          }}
-                          addBlockBelow={addBlockBelow}
-                        />
-                      )}
+                      <DynamicBlockComponent
+                        block={block}
+                        index={index}
+                        moveBlock={moveBlock}
+                        updateBlock={updateBlock}
+                        deleteBlock={(id) => {
+                          setBlocks((prev) => prev.filter((b) => b?.id !== id));
+                        }}
+                        addBlockBelow={addBlockBelow}
+                        addBlockToContainer={addBlockToContainer}
+                        moveBlockToContainer={moveBlockToContainer}
+                        moveChildBlockBetweenContainers={moveChildBlockBetweenContainers}
+                      />
                     </div>
                   )
                 )}
@@ -525,16 +507,23 @@ const SimpleEmailBuilder: FC = () => {
                 <button
                   type="button"
                   className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 shadow-sm"
-                  onClick={() => addBlockBelow(blocks.length, "text")}
+                  onClick={() => addBlockBelow(blocks.length - 1, "text")}
                 >
                   + Add Text
                 </button>
                 <button
                   type="button"
                   className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 shadow-sm"
-                  onClick={() => addBlockBelow(blocks.length, "columns")}
+                  onClick={() => addBlockBelow(blocks.length - 1, "columns")}
                 >
                   + Add Columns
+                </button>
+                <button
+                  type="button"
+                  className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors duration-200 shadow-sm"
+                  onClick={() => addBlockBelow(blocks.length - 1, "section")}
+                >
+                  + Add Section
                 </button>
               </div>
             </div>
@@ -549,7 +538,6 @@ const SimpleEmailBuilder: FC = () => {
 
               <div
                 className="border rounded-lg overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md"
-                // eslint-disable-next-line react/no-danger
                 dangerouslySetInnerHTML={{ __html: previewHtml }}
               />
 

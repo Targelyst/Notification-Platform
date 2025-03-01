@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import ContextMenu from "../ContextMenu";
 import { TrashIcon, DragHandleIcon, AddButton } from "../SharedIcons";
-import { Block, BlockType, useDraggableBlock } from "./ColumnComponent";
+
 
 interface ImageComponentProps {
   block: Block;

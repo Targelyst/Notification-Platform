@@ -10,7 +10,6 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 const App = () => {
 	return (
 		<AuthProvider>
-			<MantineProvider >
 				<div className="h-full  bg-impolar-bg overflow-auto">
 					<div className="relative flex ">
 						<ApiProvider>
@@ -18,7 +17,9 @@ const App = () => {
 								<div className="relative z-10 flex-1 flex">
 									<AuthGuard>
 										<DndProvider backend={HTML5Backend}>
+											<MantineProvider>
 											<Dashboard />
+											</MantineProvider>
 										</DndProvider>
 									</AuthGuard>
 								</div>
@@ -26,7 +27,6 @@ const App = () => {
 						</ApiProvider>
 					</div>
 				</div>
-			</MantineProvider >
 		</AuthProvider>
 	);
 };

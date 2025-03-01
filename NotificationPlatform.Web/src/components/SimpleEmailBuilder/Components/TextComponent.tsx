@@ -1,20 +1,12 @@
-// components/SimpleEmailBuilder/TextComponent.tsx
-import React, { useState } from "react";
-
+// components/SimpleEmailBuilder/Components/TextComponent.tsx
+import React, { useState, useRef } from "react";
+import { useDrag, useDrop } from "react-dnd";
+import { Block, BlockType, DraggableComponentProps, DragItem } from "../types";
+import { registerComponent } from "../ComponentRegistry";
 import ContextMenu from "../ContextMenu";
-import { TrashIcon, DragHandleIcon, AddButton } from "../SharedIcons";
-import { Block, BlockType, useDraggableBlock } from "./ColumnComponent";
+import { TrashIcon, DragHandleIcon } from "../SharedIcons";
 
-interface TextComponentProps {
-  block: Block;
-  index: number;
-  moveBlock?: (dragIndex: number, hoverIndex: number) => void;
-  updateBlock: (id: string, updates: Partial<Block>) => void;
-  deleteBlock: (id: string) => void;
-  addBlockBelow?: (index: number, type: BlockType) => void;
-}
-
-const TextComponent: React.FC<TextComponentProps> = ({
+const TextComponent: React.FC<DraggableComponentProps> = ({
   block,
   index,
   moveBlock,
@@ -26,16 +18,40 @@ const TextComponent: React.FC<TextComponentProps> = ({
     x: number;
     y: number;
   } | null>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
-  let ref = React.useRef<HTMLDivElement>(null);
-  let isDragging = false;
+  // Set up drag and drop
+  const [{ isDragging }, drag] = useDrag({
+    type: block.type,
+    item: { id: block.id, index, type: block.type },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
 
-  if (moveBlock) {
-    const draggable = useDraggableBlock(block.id, index, moveBlock, block.type); // Pass block.type
-    ref = draggable.ref;
-    isDragging = draggable.isDragging;
-  }
+  const [, drop] = useDrop<DragItem>({
+    accept: block.type,
+    hover(item, monitor) {
+      if (!ref.current) return;
+      const dragIndex = item.index;
+      const hoverIndex = index;
 
+      // Don't replace items with themselves
+      if (dragIndex === hoverIndex) return;
+
+      // Time to actually perform the action
+      if (moveBlock) {
+        moveBlock(dragIndex, hoverIndex);
+      }
+
+      // Note: we're mutating the monitor item here!
+      item.index = hoverIndex;
+    },
+  });
+
+  drag(drop(ref));
+
+  // Generate MJML for the text component
   const generateMjml = (content: string, styles: Record<string, string>) => {
     const sanitized = content.trim() || "&nbsp;";
     return `
@@ -108,8 +124,41 @@ const TextComponent: React.FC<TextComponentProps> = ({
           }}
         />
       )}
+
+      {addBlockBelow && (
+        <div className="absolute right-0 -bottom-4 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            className="bg-blue-500 text-white rounded-full p-1 shadow-md"
+            onClick={(e) => {
+              e.stopPropagation();
+              addBlockBelow(index, "text");
+            }}
+          >
+            +
+          </button>
+        </div>
+      )}
     </div>
   );
 };
+
+// Register the component with the ComponentRegistry
+registerComponent(
+  'text',
+  TextComponent,
+  (content, styles) => {
+    const sanitized = content.trim() || "&nbsp;";
+    return `
+      <mj-text 
+        line-height="1.5" 
+        padding="0"
+        font-size="${styles.fontSize || "14px"}"
+        color="${styles.color || "#000000"}"
+      >${sanitized}</mj-text>
+    `;
+  },
+  { fontSize: "14px", color: "#000000", width: "100%" },
+  "New text"
+);
 
 export default TextComponent;
