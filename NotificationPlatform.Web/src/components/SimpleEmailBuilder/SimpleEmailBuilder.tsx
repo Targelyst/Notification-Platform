@@ -258,8 +258,8 @@ const SimpleEmailBuilder: FC = () => {
                 .join("")}</mj-section>`;
             } else if (block.type === "section") {
               updatedMjml = `<mj-section background-color="${block.styles.backgroundColor || '#ffffff'}" padding="${block.styles.padding || '10px'}">
-                <mj-column>
-                  ${newChildren[0].map(child => {
+                ${newChildren.map(column => 
+                  `<mj-column>${column.map(child => {
                     // Special handling for columns inside sections
                     if (child.type === 'columns') {
                       // Remove outer mj-section tags for nested columns
@@ -267,8 +267,8 @@ const SimpleEmailBuilder: FC = () => {
                                       .replace(/<\/mj-section>$/, '');
                     }
                     return child.mjml;
-                  }).join("")}
-                </mj-column>
+                  }).join("")}</mj-column>`
+                ).join("")}
               </mj-section>`;
             }
             return {
@@ -369,15 +369,17 @@ const SimpleEmailBuilder: FC = () => {
                     .join("")}</mj-section>`;
                 } else if (block.type === "section") {
                   updatedMjml = `<mj-section background-color="${block.styles.backgroundColor || '#ffffff'}" padding="${block.styles.padding || '10px'}">
-                    ${newChildren[0].map(child => {
-                      // Special handling for columns inside sections
-                      if (child.type === 'columns') {
-                        // Remove outer mj-section tags for nested columns
-                        return child.mjml.replace(/^<mj-section[^>]*>/, '')
-                                        .replace(/<\/mj-section>$/, '');
-                      }
-                      return child.mjml;
-                    }).join("")}
+                    ${newChildren.map(column => 
+                      `<mj-column>${column.map(child => {
+                        // Special handling for columns inside sections
+                        if (child.type === 'columns') {
+                          // Remove outer mj-section tags for nested columns
+                          return child.mjml.replace(/^<mj-section[^>]*>/, '')
+                                          .replace(/<\/mj-section>$/, '');
+                        }
+                        return child.mjml;
+                      }).join("")}</mj-column>`
+                    ).join("")}
                   </mj-section>`;
                 }
   

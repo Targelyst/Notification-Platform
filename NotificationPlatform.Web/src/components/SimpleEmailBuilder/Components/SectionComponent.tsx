@@ -37,54 +37,47 @@ export const DraggableChildBlock: React.FC<{
   deleteChildBlock,
   moveChildBlockBetweenContainers,
 }) => {
-  const { ref, isDragging } = useDraggableChildBlock(
-    parentId,
-    containerIndex,
-    child.id,
-    childIndex,
-    moveChildBlock,
-    moveChildBlockBetweenContainers
-  );
+    const { ref, isDragging } = useDraggableChildBlock(
+      parentId,
+      containerIndex,
+      child.id,
+      childIndex,
+      moveChildBlock,
+      moveChildBlockBetweenContainers
+    );
 
-  const commonProps = {
-    block: child,
-    index: childIndex,
-    updateBlock: updateChildBlock,
-    deleteBlock: deleteChildBlock,
+    const commonProps = {
+      block: child,
+      index: childIndex,
+      updateBlock: updateChildBlock,
+      deleteBlock: deleteChildBlock,
+    };
+
+    return (
+      <div
+        ref={ref}
+        style={{
+          opacity: isDragging ? 0.5 : 1,
+          border: '1px solid #ddd',
+          margin: '4px'
+        }}
+      >
+        <DynamicBlockComponent {...commonProps} />
+      </div>
+    );
   };
-
-  return (
-    <div
-      ref={ref}
-      style={{
-        opacity: isDragging ? 0.5 : 1,
-        border: '1px solid #ddd',
-        margin: '4px'
-      }}
-    >
-      <DynamicBlockComponent {...commonProps} />
-    </div>
-  );
-};
 
 const SectionComponent: React.FC<ContainerComponentProps> = (props) => {
   // Generate MJML for the section container
   const generateSectionMjml = (children: Block[][]) => {
     // Support for multiple columns within a section
-    if (children.length > 1) {
-      return `<mj-section background-color="${props.block.styles.backgroundColor || '#ffffff'}" 
+    return `<mj-section background-color="${props.block.styles.backgroundColor || '#ffffff'}" 
                       padding="${props.block.styles.padding || '10px'}">
-              ${children.map(column => 
-                `<mj-column>${column.map(child => child.mjml).join("")}</mj-column>`
-              ).join("")}
+              ${children.map(column =>
+      `<mj-column>${column.map(child => child.mjml).join("")}</mj-column>`
+    ).join("")}
             </mj-section>`;
-    } else {
-      // Standard single-column section
-      return `<mj-section background-color="${props.block.styles.backgroundColor || '#ffffff'}" 
-                      padding="${props.block.styles.padding || '10px'}">
-              ${children[0]?.map(child => child.mjml).join("") || ""}
-            </mj-section>`;
-    }
+
   };
 
   // Render the section container content
@@ -131,7 +124,7 @@ const SectionComponent: React.FC<ContainerComponentProps> = (props) => {
         <div
           ref={drop}
           className="relative min-h-[100px] border-2 border-transparent hover:border-blue-500 flex-1"
-          style={{ 
+          style={{
             backgroundColor: isOver ? "lightyellow" : "transparent",
             padding: props.block.styles.padding || "10px",
             border: "1px dashed #ccc"
@@ -167,21 +160,21 @@ const SectionComponent: React.FC<ContainerComponentProps> = (props) => {
     };
 
     return (
-      <div 
-        style={{ 
-          backgroundColor: props.block.styles.backgroundColor || "#ffffff", 
+      <div
+        style={{
+          backgroundColor: props.block.styles.backgroundColor || "#ffffff",
           padding: "10px"
         }}
       >
         <div className="text-xs text-gray-500 mb-2 flex justify-between">
           <span>Section</span>
-          <button 
+          <button
             className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
             onClick={() => {
               // Add a new column to the section
               const newChildren = [...(props.block.children || [[]])];
               newChildren.push([]);
-              props.updateBlock(props.block.id, { 
+              props.updateBlock(props.block.id, {
                 children: newChildren,
                 mjml: generateSectionMjml(newChildren)
               });
