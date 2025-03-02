@@ -97,11 +97,10 @@ const TextComponent: React.FC<DraggableComponentProps> = ({
           }}
         />
         <div className="opacity-0 group-hover:opacity-100 flex gap-2 transition-opacity">
-          {moveBlock && (
-            <button className="cursor-move" onClick={(e) => e.preventDefault()}>
-              <DragHandleIcon />
-            </button>
-          )}
+
+          <button className="cursor-move" onClick={(e) => e.preventDefault()}>
+            <DragHandleIcon />
+          </button>
           <button onClick={() => deleteBlock(block.id)}>
             <TrashIcon />
           </button>
@@ -125,19 +124,6 @@ const TextComponent: React.FC<DraggableComponentProps> = ({
         />
       )}
 
-      {addBlockBelow && (
-        <div className="absolute right-0 -bottom-4 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            className="bg-blue-500 text-white rounded-full p-1 shadow-md"
-            onClick={(e) => {
-              e.stopPropagation();
-              addBlockBelow(index, "text");
-            }}
-          >
-            +
-          </button>
-        </div>
-      )}
     </div>
   );
 };

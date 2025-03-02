@@ -124,71 +124,84 @@ const SimpleEmailBuilder: FC = () => {
     []
   );
 
-  const moveChildBlockBetweenContainers = useCallback(
-    (
-      sourceParentId: string,
-      sourceContainerIndex: number,
-      blockId: string,
-      targetParentId: string,
-      targetContainerIndex: number,
-      insertIndex: number = -1
-    ) => {
-      setBlocks((prevBlocks) => {
-        const newBlocks = [...prevBlocks];
-        
-        // Find source parent and remove the block
-        const sourceParent = newBlocks.find((b) => b.id === sourceParentId);
-        if (!sourceParent?.children) return prevBlocks;
-        
-        const sourceContainer = [...sourceParent.children[sourceContainerIndex]];
-        const blockIndex = sourceContainer.findIndex((b) => b.id === blockId);
-        if (blockIndex === -1) return prevBlocks;
-        
-        const [movedBlock] = sourceContainer.splice(blockIndex, 1);
-        sourceParent.children[sourceContainerIndex] = sourceContainer;
-        
-        // Update source parent MJML based on its type
-        if (sourceParent.type === "columns") {
-          sourceParent.mjml = `<mj-section>${sourceParent.children
-            .map((col) => `<mj-column>${col.map((c) => c.mjml).join("")}</mj-column>`)
-            .join("")}</mj-section>`;
-        } else if (sourceParent.type === "section") {
-          sourceParent.mjml = `<mj-section background-color="${sourceParent.styles.backgroundColor || '#ffffff'}" padding="${sourceParent.styles.padding || '10px'}">
-            ${sourceParent.children[0].map(c => c.mjml).join("")}
-          </mj-section>`;
+  
+const moveChildBlockBetweenContainers = useCallback(
+  (
+    sourceParentId: string,
+    sourceContainerIndex: number,
+    blockId: string,
+    targetParentId: string,
+    targetContainerIndex: number,
+    insertIndex: number = -1
+  ) => {
+    setBlocks((prevBlocks) => {
+      const newBlocks = [...prevBlocks];
+      
+      // Find source parent and remove the block
+      let sourceParent = newBlocks.find((b) => b.id === sourceParentId);
+      if (!sourceParent?.children) return prevBlocks;
+      
+      // Ensure we have valid container indexes
+      if (sourceContainerIndex < 0 || sourceContainerIndex >= sourceParent.children.length) {
+        return prevBlocks;
+      }
+      
+      const sourceContainer = [...sourceParent.children[sourceContainerIndex]];
+      const blockIndex = sourceContainer.findIndex((b) => b.id === blockId);
+      if (blockIndex === -1) return prevBlocks;
+      
+      const [movedBlock] = sourceContainer.splice(blockIndex, 1);
+      sourceParent.children[sourceContainerIndex] = sourceContainer;
+      
+      // Update source parent MJML
+      updateContainerMjml(sourceParent);
+      
+      // Find target parent and add the block
+      const targetParent = newBlocks.find((b) => b.id === targetParentId);
+      if (!targetParent?.children) return prevBlocks;
+      
+      // Make sure we have a valid target container
+      if (targetContainerIndex < 0 || targetContainerIndex >= targetParent.children.length) {
+        // Create a new column if needed
+        while (targetContainerIndex >= targetParent.children.length) {
+          targetParent.children.push([]);
         }
-        
-        // Find target parent and add the block
-        const targetParent = newBlocks.find((b) => b.id === targetParentId);
-        if (!targetParent?.children) return prevBlocks;
-        
-        const targetContainer = [...(targetParent.children[targetContainerIndex] || [])];
-        
-        // Add at specific position if provided, otherwise append to end
-        if (insertIndex >= 0 && insertIndex <= targetContainer.length) {
-          targetContainer.splice(insertIndex, 0, movedBlock);
-        } else {
-          targetContainer.push(movedBlock);
-        }
-        
-        targetParent.children[targetContainerIndex] = targetContainer;
-        
-        // Update target parent MJML
-        if (targetParent.type === "columns") {
-          targetParent.mjml = `<mj-section>${targetParent.children
-            .map((col) => `<mj-column>${col.map((c) => c.mjml).join("")}</mj-column>`)
-            .join("")}</mj-section>`;
-        } else if (targetParent.type === "section") {
-          targetParent.mjml = `<mj-section background-color="${targetParent.styles.backgroundColor || '#ffffff'}" padding="${targetParent.styles.padding || '10px'}">
-            ${targetParent.children[0].map(c => c.mjml).join("")}
-          </mj-section>`;
-        }
-        
-        return newBlocks;
-      });
-    },
-    []
-  );
+      }
+      
+      const targetContainer = [...targetParent.children[targetContainerIndex]];
+      
+      // Add at specific position if provided, otherwise append to end
+      if (insertIndex >= 0 && insertIndex <= targetContainer.length) {
+        targetContainer.splice(insertIndex, 0, movedBlock);
+      } else {
+        targetContainer.push(movedBlock);
+      }
+      
+      targetParent.children[targetContainerIndex] = targetContainer;
+      
+      // Update target parent MJML
+      updateContainerMjml(targetParent);
+      
+      return newBlocks;
+    });
+  },
+  []
+);
+
+// Helper function to update a container's MJML based on its type
+const updateContainerMjml = (container: Block) => {
+  if (container.type === "columns") {
+    container.mjml = `<mj-section>${container.children
+      .map((col) => `<mj-column>${col.map((c) => c.mjml || '').join("")}</mj-column>`)
+      .join("")}</mj-section>`;
+  } else if (container.type === "section") {
+    container.mjml = `<mj-section background-color="${container.styles.backgroundColor || '#ffffff'}" padding="${container.styles.padding || '10px'}">
+      ${container.children.map(col => 
+        `<mj-column>${col.map(c => c.mjml || '').join("")}</mj-column>`
+      ).join("")}
+    </mj-section>`;
+  }
+};
 
   const moveBlock = useCallback((dragIndex: number, hoverIndex: number) => {
     setBlocks((prev) => {

@@ -35,7 +35,6 @@ export const useDraggableBlock = (
   return { ref, isDragging };
 };
 
-// Hook for making child blocks draggable
 export const useDraggableChildBlock = (
   parentId: string,
   containerIndex: number,
@@ -52,14 +51,20 @@ export const useDraggableChildBlock = (
     blockId: string,
     targetParentId: string,
     targetContainerIndex: number,
-    insertIndex: number
+    insertIndex?: number
   ) => void
 ) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const [{ isDragging }, drag] = useDrag<DragItem, unknown, { isDragging: boolean }>({
     type: "child-block",
-    item: { id: blockId, index, parentId, containerIndex, type: "child-block" },
+    item: { 
+      id: blockId, 
+      index, 
+      parentId, 
+      containerIndex, 
+      type: "child-block",
+    },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -93,7 +98,7 @@ export const useDraggableChildBlock = (
         moveChildBlock(containerIndex, dragIndex, hoverIndex);
         item.index = hoverIndex;
       }
-      // If from different container
+      // If from different container - process immediately in hover
       else {
         moveChildBlockBetweenContainers(
           item.parentId!,
@@ -163,13 +168,24 @@ export const BaseContainerComponent: React.FC<ContainerComponentProps & {
 
   // Update a child block
   const updateChildBlock = (id: string, updates: Partial<Block>) => {
-    const newChildren = (block.children || []).map((container) =>
-      container.map((child) => (child.id === id ? { ...child, ...updates } : child))
+    const newChildren = [...(block.children || [])];
+    
+    // Find the child block in any column and update it
+    const updatedChildren = newChildren.map(column => 
+      column.map(child => 
+        child.id === id ? { ...child, ...updates } : child
+      )
     );
     
+    // Update parent block with new children structure
     updateBlock(block.id, { 
-      children: newChildren,
-      mjml: generateContainerMjml(newChildren)
+      children: updatedChildren,
+      // Optionally update MJML if needed
+      mjml: `<mj-section>${updatedChildren
+        .map(column => 
+          `<mj-column>${column.map(c => c?.mjml || '').join('')}</mj-column>`
+        )
+        .join('')}</mj-section>`
     });
   };
 

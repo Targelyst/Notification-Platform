@@ -5,6 +5,7 @@ import { Block, ContainerComponentProps, DragItem } from "../types";
 import { BaseContainerComponent, useDraggableChildBlock } from "./BaseContainerComponent";
 import { registerComponent, DynamicBlockComponent } from "../ComponentRegistry";
 import { AddButton } from "../SharedIcons";
+import ColumnComponent from "./ColumnComponent";
 
 // Component for draggable child blocks
 export const DraggableChildBlock: React.FC<{
@@ -67,20 +68,100 @@ export const DraggableChildBlock: React.FC<{
     );
   };
 
+  const SectionColumn = React.memo(({ 
+    columnChildren, 
+    columnIndex, 
+    sectionId,
+    moveChildBlock,
+    updateChildBlock,
+    deleteChildBlock,
+    moveChildBlockBetweenContainers,
+    addBlockToContainer,
+    updateBlock,
+    generateSectionMjml
+  }) => {
+    // Setup drop handlers for this column
+    const [{ isOver }, drop] = useDrop({
+      accept: ["text", "image", "child-block"],
+      drop: (item, monitor) => {
+        if (!monitor.isOver({ shallow: true })) return undefined;
+  
+        if (item.type === "child-block" && 
+            (item.parentId !== sectionId || item.containerIndex !== columnIndex)) {
+          moveChildBlockBetweenContainers(
+            item.parentId,
+            item.containerIndex,
+            item.id,
+            sectionId,
+            columnIndex
+          );
+          return { handled: true };
+        }
+        return undefined;
+      },
+      collect: (monitor) => ({
+        isOver: monitor.isOver({ shallow: true }),
+      }),
+    });
+  
+    return (
+      <div
+        ref={drop}
+        className="flex-1 relative min-h-[100px] border-2 border-transparent hover:border-blue-500"
+        style={{ backgroundColor: isOver ? "lightyellow" : "transparent" }}
+      >
+        {columnChildren?.filter(child => !!child).map((child, childIndex) => (
+          <DraggableChildBlock
+            key={child.id}
+            child={child}
+            childIndex={childIndex}
+            containerIndex={columnIndex}
+            parentId={sectionId}
+            moveChildBlock={moveChildBlock}
+            updateChildBlock={updateChildBlock}
+            deleteChildBlock={deleteChildBlock}
+            moveChildBlockBetweenContainers={moveChildBlockBetweenContainers}
+          />
+        ))}
+  
+        <AddButton
+          className="absolute"
+          onClick={(e) => {
+            e.stopPropagation();
+            addBlockToContainer(sectionId, columnIndex, "text");
+          }}
+        />
+      </div>
+    );
+  });
+
 const SectionComponent: React.FC<ContainerComponentProps> = (props) => {
   // Generate MJML for the section container
   const generateSectionMjml = (children: Block[][]) => {
-    // Support for multiple columns within a section
+    if (!children || !Array.isArray(children)) {
+      return `<mj-section background-color="${props.block.styles.backgroundColor || '#ffffff'}" 
+                padding="${props.block.styles.padding || '10px'}">
+                <mj-column></mj-column>
+              </mj-section>`;
+    }
+    
     return `<mj-section background-color="${props.block.styles.backgroundColor || '#ffffff'}" 
                       padding="${props.block.styles.padding || '10px'}">
-              ${children.map(column =>
-      `<mj-column>${column.map(child => child.mjml).join("")}</mj-column>`
-    ).join("")}
+              ${children.map(column => {
+                if (!column || !Array.isArray(column)) {
+                  return `<mj-column></mj-column>`;
+                }
+                
+                // Filter out any undefined values before mapping
+                return `<mj-column>${column
+                  .filter(child => !!child)
+                  .map(child => child.mjml || '')
+                  .join("")}</mj-column>`;
+              }).join("")}
             </mj-section>`;
-
   };
 
-  // Render the section container content
+
   const renderSectionContent = ({
     children,
     selectedContainer,
@@ -88,77 +169,8 @@ const SectionComponent: React.FC<ContainerComponentProps> = (props) => {
     moveChildBlock,
     updateChildBlock,
     deleteChildBlock,
-    moveChildBlockBetweenContainers,
-    renderChildComponent
+    moveChildBlockBetweenContainers
   }) => {
-    // Define a reusable container component to avoid duplicating hook usage
-    const Container = ({ containerIndex }) => {
-      const [{ isOver }, drop] = useDrop({
-        accept: ["text", "image", "child-block"],
-        drop: (item: DragItem, monitor) => {
-          if (!monitor.isOver({ shallow: true })) return undefined;
-
-          const itemType = monitor.getItemType();
-          if (itemType === "child-block") {
-            if (item.parentId !== props.block.id || item.containerIndex !== containerIndex) {
-              props.moveChildBlockBetweenContainers(
-                item.parentId!,
-                item.containerIndex!,
-                item.id,
-                props.block.id,
-                containerIndex
-              );
-              return { handled: true };
-            }
-          } else {
-            props.moveBlockToContainer(item.id, props.block.id, containerIndex);
-            return { handled: true };
-          }
-        },
-        collect: (monitor) => ({
-          isOver: monitor.isOver({ shallow: true }),
-        }),
-      });
-
-      return (
-        <div
-          ref={drop}
-          className="relative min-h-[100px] border-2 border-transparent hover:border-blue-500 flex-1"
-          style={{
-            backgroundColor: isOver ? "lightyellow" : "transparent",
-            padding: props.block.styles.padding || "10px",
-            border: "1px dashed #ccc"
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            setSelectedContainer(containerIndex);
-          }}
-        >
-          {(children[containerIndex] || []).map((child, childIndex) => (
-            <DraggableChildBlock
-              key={child.id}
-              child={child}
-              childIndex={childIndex}
-              containerIndex={containerIndex}
-              parentId={props.block.id}
-              moveChildBlock={moveChildBlock}
-              updateChildBlock={updateChildBlock}
-              deleteChildBlock={deleteChildBlock}
-              moveChildBlockBetweenContainers={moveChildBlockBetweenContainers}
-            />
-          ))}
-
-          <AddButton
-            className="absolute"
-            onClick={(e) => {
-              e.stopPropagation();
-              props.addBlockToContainer(props.block.id, containerIndex, "text");
-            }}
-          />
-        </div>
-      );
-    };
-
     return (
       <div
         style={{
@@ -171,7 +183,6 @@ const SectionComponent: React.FC<ContainerComponentProps> = (props) => {
           <button
             className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
             onClick={() => {
-              // Add a new column to the section
               const newChildren = [...(props.block.children || [[]])];
               newChildren.push([]);
               props.updateBlock(props.block.id, {
@@ -183,10 +194,22 @@ const SectionComponent: React.FC<ContainerComponentProps> = (props) => {
             + Add Column
           </button>
         </div>
-
+  
         <div className="flex gap-2">
-          {children.map((_, containerIndex) => (
-            <Container key={containerIndex} containerIndex={containerIndex} />
+          {children.map((columnChildren, columnIndex) => (
+            <SectionColumn
+              key={`${props.block.id}-column-${columnIndex}`}
+              columnChildren={columnChildren}
+              columnIndex={columnIndex}
+              sectionId={props.block.id}
+              moveChildBlock={moveChildBlock}
+              updateChildBlock={updateChildBlock}
+              deleteChildBlock={deleteChildBlock}
+              moveChildBlockBetweenContainers={moveChildBlockBetweenContainers}
+              addBlockToContainer={props.addBlockToContainer}
+              updateBlock={props.updateBlock}
+              generateSectionMjml={generateSectionMjml}
+            />
           ))}
         </div>
       </div>

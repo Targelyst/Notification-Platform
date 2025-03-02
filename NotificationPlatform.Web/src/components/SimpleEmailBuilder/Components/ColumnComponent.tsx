@@ -212,19 +212,44 @@ const ColumnComponent: React.FC<ContainerComponentProps> = ({
     hoverIndex: number
   ) => {
     const newChildren = [...(block.children || [])];
-    const columnChildren = [...newChildren[containerIndex]];
+
+    // Make sure the containerIndex is valid
+    if (containerIndex >= newChildren.length) return;
+
+    // Filter out any undefined values
+    const columnChildren = [...newChildren[containerIndex]].filter(child => !!child);
+
+    // Make sure drag and hover indices are valid
+    if (dragIndex < 0 || dragIndex >= columnChildren.length ||
+      hoverIndex < 0 || hoverIndex > columnChildren.length) return;
+
     const [draggedItem] = columnChildren.splice(dragIndex, 1);
     columnChildren.splice(hoverIndex, 0, draggedItem);
     newChildren[containerIndex] = columnChildren;
     updateBlock(block.id, { children: newChildren });
   };
-
   const updateChildBlock = (id: string, updates: Partial<Block>) => {
-    const newChildren = (block.children || []).map((col) =>
-      col.map((child) => (child.id === id ? { ...child, ...updates } : child))
+    const newChildren = [...(block.children || [])];
+
+    // Find the child block in any column and update it
+    const updatedChildren = newChildren.map(column =>
+      column.map(child =>
+        child.id === id ? { ...child, ...updates } : child
+      )
     );
-    updateBlock(block.id, { children: newChildren });
+
+    // Update parent block with new children structure
+    updateBlock(block.id, {
+      children: updatedChildren,
+      // Optionally update MJML if needed
+      mjml: `<mj-section>${updatedChildren
+        .map(column =>
+          `<mj-column>${column.map(c => c?.mjml || '').join('')}</mj-column>`
+        )
+        .join('')}</mj-section>`
+    });
   };
+
 
   const deleteChildBlock = (id: string) => {
     const newChildren = (block.children || []).map((col) =>
@@ -247,12 +272,9 @@ const ColumnComponent: React.FC<ContainerComponentProps> = ({
               // Only process if this is the direct hover target
               if (!monitor.isOver({ shallow: true })) return;
 
-              // For child-block items
+              // For child-block items being dragged between containers
               if (item.type === "child-block") {
-                // Only perform visual feedback during hover, not actual movement
-                if (item.containerIndex === colIndex && item.parentId === block.id) {
-                  // Handle same-column hovering (already implemented elsewhere)
-                }
+                // Visual feedback only during hover
               }
             },
             drop: (item, monitor) => {
@@ -260,8 +282,8 @@ const ColumnComponent: React.FC<ContainerComponentProps> = ({
               if (!monitor.isOver({ shallow: true })) return undefined;
 
               const itemType = monitor.getItemType();
-              if (itemType === "child-block") {
-                // Only perform actual movement during drop
+              if (itemType === "child-block" && item && item.id) {
+                // Handle cross-container drops - this works for any container type
                 if (item.parentId !== block.id || item.containerIndex !== colIndex) {
                   moveChildBlockBetweenContainers(
                     item.parentId!,
@@ -272,7 +294,7 @@ const ColumnComponent: React.FC<ContainerComponentProps> = ({
                   );
                   return { handled: true };
                 }
-              } else {
+              } else if (item && item.id) {
                 moveBlockToContainer(item.id, block.id, colIndex);
                 return { handled: true };
               }
@@ -293,7 +315,7 @@ const ColumnComponent: React.FC<ContainerComponentProps> = ({
                 setSelectedColumn(colIndex);
               }}
             >
-              {column?.map((child, childIndex) => (
+              {column?.filter(child => !!child).map((child, childIndex) => (
                 <DraggableChildBlock
                   key={child.id}
                   child={child}
