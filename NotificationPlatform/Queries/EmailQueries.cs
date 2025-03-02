@@ -1,9 +1,12 @@
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using NotificationPlatform.Data;
+using NotificationPlatform.Exceptions;
 using NotificationPlatform.Models.Email;
+using NotificationPlatform.Services.Tracking;
 
 namespace NotificationPlatform.Queries;
+
+public record UrlResult(string Url);
 
 [QueryType]
 public static class EmailQueries {
@@ -36,6 +39,35 @@ public static class EmailQueries {
             .Where(ec => ec.EmailConfigurationId == emailConfigurationId)
             .OrderBy(ec => ec.Id)
             .ThenBy(ec => ec.Id);
+
+    [Error<NotFoundException>]
+    public static async Task<UrlResult> GetTrackLinkAsync(
+        Guid emailContactId,
+        NotificationPlatformContext db,
+        TrackerService trackerService
+    ) {
+        var emailContact = await db.EmailContacts
+            .FindAsync(emailContactId)
+            ?? throw new NotFoundException(nameof(EmailContact));
+
+        TrackIdentifier identifier = new(emailContact.Tenant, emailContact.Id.ToString());
+        return new(trackerService.CreateTrackUrl(identifier));
+    }
+
+    [Error<NotFoundException>]
+    public static async Task<UrlResult> GetProxyLinkAsync(
+        Guid emailContactId,
+        string url,
+        NotificationPlatformContext db,
+        TrackerService trackerService
+    ) {
+        var emailContact = await db.EmailContacts
+            .FindAsync(emailContactId)
+            ?? throw new NotFoundException(nameof(EmailContact));
+
+        ProxyIdentifier identifier = new(emailContact.Tenant, emailContact.Id.ToString(), url);
+        return new(trackerService.CreateProxyUrl(identifier));
+    }
 
     [UsePaging]
     [UseProjection]

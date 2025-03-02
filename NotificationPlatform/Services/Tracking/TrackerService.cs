@@ -10,14 +10,23 @@ public sealed class TrackerService(
 
     private readonly Sbee sbee = new(Convert.FromHexString(configuration.Value.TokenKey));
 
-    public string CreateTrackerUrl(TrackIdentifier identifier) {
-        byte[] encodedIdentifier = MessagePackSerializer.Serialize(identifier);
-        string encryptedIdentifier = this.sbee.Encode(encodedIdentifier);
+    public string CreateTrackUrl(TrackIdentifier identifier) {
+        string encodedIdentifier = this.encodeIdentifier(identifier);
+        return $"{configuration.Value.ExternalBaseUrl}/track/{encodedIdentifier}";
+    }
 
-        return encryptedIdentifier;
+    public string CreateProxyUrl(ProxyIdentifier identifier) {
+        string encodedIdentifier = this.encodeIdentifier(identifier);
+        return $"{configuration.Value.ExternalBaseUrl}/proxy/{encodedIdentifier}";
     }
 
     public void Dispose() {
         this.sbee.Dispose();
     }
+
+    private string encodeIdentifier(object identifier) {
+        byte[] encodedIdentifier = MessagePackSerializer.Serialize(identifier);
+        return this.sbee.Encode(encodedIdentifier);
+    }
+
 }

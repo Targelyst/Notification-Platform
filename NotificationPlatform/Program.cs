@@ -6,6 +6,7 @@ using NotificationPlatform.Configuration;
 using NotificationPlatform.Data;
 using NotificationPlatform.Models.Email;
 using NotificationPlatform.Services;
+using NotificationPlatform.Services.Tracking;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,11 @@ builder.Services.AddOptions<AuthConfiguration>()
 
 builder.Services.AddOptions<SecurityConfiguration>()
   .Bind(builder.Configuration.GetSection(SecurityConfiguration.Section))
+  .ValidateDataAnnotations()
+  .ValidateOnStart();
+
+builder.Services.AddOptions<TrackerConfiguration>()
+  .Bind(builder.Configuration.GetSection(TrackerConfiguration.Section))
   .ValidateDataAnnotations()
   .ValidateOnStart();
 
@@ -45,6 +51,7 @@ builder.Services
     .AddScoped<IAuthorizationHandler, HasTenantHandler>()
     .AddScoped<EmailContactPropertyService>()
     .AddSingleton<ICryptographyService, CryptographyServiceAES>()
+    .AddSingleton<TrackerService>()
     .AddCors(options => {
         options.AddDefaultPolicy(policy => {
             var origins = builder.Configuration

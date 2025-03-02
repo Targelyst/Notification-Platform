@@ -9,17 +9,18 @@ use tokio::{
     time,
 };
 use tracing::error;
+use uuid::Uuid;
 
 pub(crate) struct TrackedEvent {
     pub time: OffsetDateTime,
     pub tenant: String,
-    pub contact: String,
+    pub contact: Uuid,
 }
 
 pub(crate) struct ProxiedEvent {
     pub time: OffsetDateTime,
     pub tenant: String,
-    pub contact: String,
+    pub contact: Uuid,
     pub url: String,
 }
 
@@ -136,7 +137,7 @@ impl EventPublisher {
 
     async fn write_proxied_events(&self, events: &[ProxiedEvent]) -> Result<(), sqlx::Error> {
         let mut query_builder = QueryBuilder::new(
-            r#"INSERT INTO "ProxiedEvents" ("Time", "Tenant", "ContactId", "Url", Value") "#,
+            r#"INSERT INTO "ProxiedEvents" ("Time", "Tenant", "ContactId", "Url", "Value") "#,
         );
 
         let chunks = events.iter().chunk_by(|e| (&e.tenant, &e.contact, &e.url));

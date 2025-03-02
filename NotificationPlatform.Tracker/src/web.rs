@@ -27,6 +27,8 @@ const TRACKING_PIXEL_CONTENT: [u8; 68] = [
     129, 208, 47, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130,
 ];
 
+const MIME_TYPE_PNG: &str = "image/png";
+
 #[derive(Error, Debug)]
 pub(crate) enum TrackerError {
     #[error("error while trying to listen on address")]
@@ -83,7 +85,9 @@ async fn track_handler(State(state): State<AppState>, Path(identifier): Path<Str
                     contact: identifier.contact,
                 })
                 .await;
-            (StatusCode::OK, TRACKING_PIXEL_CONTENT).into_response()
+
+            let headers = [(header::CONTENT_TYPE, MIME_TYPE_PNG)];
+            (headers, TRACKING_PIXEL_CONTENT).into_response()
         }
     }
 }
