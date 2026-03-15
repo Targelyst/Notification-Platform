@@ -9,27 +9,45 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
     volumes:
-      - pg_data:/home/postgres/pgdata/data
+      - pg_data:/home/postgres/pgdata/dat
 
-  # Authentication management and portal
-  keycloak:
-    image: quay.io/keycloak/keycloak:26.0.1
-    restart: always
-    ports:
-      - "9082:8080"
+  authentik-server:
+    image: ghcr.io/goauthentik/server:2025.10
+    command: server
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
-      KC_BOOTSTRAP_ADMIN_USERNAME: admin
-      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
-    command: start-dev # --import-realm
+      AUTHENTIK_POSTGRESQL__HOST: db
+      AUTHENTIK_POSTGRESQL__NAME: notification_platform
+      AUTHENTIK_POSTGRESQL__USER: admin
+      AUTHENTIK_POSTGRESQL__PASSWORD: admin
+      AUTHENTIK_SECRET_KEY: secretkey
+      AUTHENTIK_BOOTSTRAP_PASSWORD: admin
+      AUTHENTIK_BOOTSTRAP_EMAIL: admin@admin.com
+    ports:
+      - 9054:9000
+      # - ${COMPOSE_PORT_HTTPS:-9443}:9443
+    restart: unless-stopped
+
+  authentik-worker:
+    image: ghcr.io/goauthentik/server:2025.10
+    command: worker
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: db
+      AUTHENTIK_POSTGRESQL__NAME: notification_platform
+      AUTHENTIK_POSTGRESQL__USER: admin
+      AUTHENTIK_POSTGRESQL__PASSWORD: admin
+      AUTHENTIK_SECRET_KEY: secretkey
+      AUTHENTIK_BOOTSTRAP_PASSWORD: admin
+      AUTHENTIK_BOOTSTRAP_EMAIL: admin@admin.com
+    restart: unless-stopped
+    user: root
     volumes:
-      - keycloak_data:/opt/keycloak/data
-    # configs:
-    #   - source: keycloak-realm
-    #     target: /opt/keycloak/data/import/impolar.json
+      - ./Authentik/Blueprints:/blueprints/impolar
 
 volumes:
   pg_data:
-  keycloak_data:
-# configs:
-#   keycloak-realm:
-#     content: |

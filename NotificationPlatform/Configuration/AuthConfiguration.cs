@@ -9,6 +9,12 @@ public class AuthConfiguration {
     public required string MetadataAddress { get; set; }
 
     [Required]
+    public required Uri BaseUrl { get; set; }
+
+    [Required]
+    public required string ApiKey { get; set; }
+
+    [Required]
     public required string Audience { get; set; }
 
     public string TenantClaim { get; set; } = "tenant";

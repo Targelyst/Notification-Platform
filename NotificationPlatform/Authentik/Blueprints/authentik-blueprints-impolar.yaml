@@ -1,0 +1,475 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Impolar Blueprints
+context: {}
+entries:
+  - attrs:
+      name: Impolar
+      certificate_data: |
+        -----BEGIN CERTIFICATE-----
+        MIIFAzCCAuugAwIBAgIUPAiHZ0zaSVWPG8qY7keic/elI+YwDQYJKoZIhvcNAQEL
+        BQAwETEPMA0GA1UEAwwGSW1wb2FyMB4XDTI2MDIwOTA2NTE1N1oXDTM2MDIwNzA2
+        NTE1N1owETEPMA0GA1UEAwwGSW1wb2FyMIICIjANBgkqhkiG9w0BAQEFAAOCAg8A
+        MIICCgKCAgEAnOgdI+/Mt0+Hx61j5MhJXZ4wqDOC8HQcxBsxAy1GKVnECATLelJj
+        nc8myL6TWqU3zh0Xi4BivklAU7zZumB2vT6ArmA/55ledUpPwo3OLprpL3Z/qrAY
+        5UYyrLD0nuCyYiHR0YWnMOkWnuhFuGpfHgW8VntxVLInLJaN8TisDSNvohW1wTHz
+        K05CrjZnbUX5oyHhKIQfZW4slvVlkBrzIQMeFf25islFIg/zjAHdgVlyNCOflECu
+        GEW+mb6qqu8LnJa8E77Z7bvBWkRA6k/F90MuCfXypPqpNnIYeVvo6bbAEVGx9Zhm
+        pumf6dL9Dee8maKuOs/z69LH5M0Qw/CDHF48jC6m1gQsIHT7KrkqdqRWOvkn/Nr7
+        FY2dE8tVZqogxdzJQlwWfFMI0fA6zd7n425rJW3XFnY/t8SfNx08DZ3KZE6YiHXY
+        npCbi8LVF70RPuZ8JpYucyuHXKPLyyULJCBcalPquBVY6Tj29YrvPttR7JINHHfa
+        Vc6eOWGBTnJmLY7A/pbpi68z5OzO0Gzl4DlMlfIzAEoCSJtui8x3hrX4Z4FYmLNb
+        /9DLp7+++bNM4+B0HvApTFZVKsXEvwu9F1rhDBQmZWlkiy2b7yoOKNL3x7k7xOSY
+        yzHlayz2UcpZa4BkVF4t/uboMWz73IvGnAAA6F5hk8LukqP+++1o9P8CAwEAAaNT
+        MFEwHQYDVR0OBBYEFPhNAdCToYhGx87DASL8MoaJBlgrMB8GA1UdIwQYMBaAFPhN
+        AdCToYhGx87DASL8MoaJBlgrMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQEL
+        BQADggIBAHgOENH+xFbq0hNbd+ZNwXbpMv0hd7M4OXBUdNFRQ6g5MVPCpzmyPVdv
+        TR7DJYhzozujGyEHcqgphTV1GWY9NpQTa61BcBRRGWat2Nm0E5EVb69EmxDNuyDm
+        5jjMmfBQatmxsl0FAq0o0iV8arqTeoeOe+2bdTiXOcth7TszQfJi2wSiO5VuzZjB
+        Je2JbG3FwqBWNRIYsa3I2HG1Meh33Pcy0TYS8OCOJMiQx76aKaIX7jKgI2fFUEH+
+        Vu4mnKIRSrbSF0pT4XQD9ojtf8/YazeMttjMxJZQJbW6na1zF3COCWW4aJ8/b+MB
+        MZPZHrzgjp2QDs1MZgnaXvRvJue0wl5y+V5wvvS6dl7o0aeadxOA18K1/vgIvZY8
+        Ts/eVQT0xnUPiHAjhF7bBDuT2e3OmAl75SIq9B3E7z3RL4QaqREHD4/0gWBffST/
+        zEg3k0/cZ098FB8sXd/u3rG99Y1daQmE+qcBi5JxgYH3i768QlxjMMAFERlbceZc
+        1UBwuWR3B77kUwJ/mtbEmKWakOEXaJhawNWRx2zca9W1etx9ilpuTm9lKxEuKBn8
+        4eZzQ1mO65DCdsyXvse2Qj0CDAPFDcqPA01NzJDj3Vec7PaaO1QWA1CeyQHmu/w9
+        lYpuKcJsCHSyQG9wOQmpet9lnII5WeT1gLE4cYBQKZqPk5CUvcQ9
+        -----END CERTIFICATE-----
+      key_data: |
+        -----BEGIN PRIVATE KEY-----
+        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
+        bRd/6ajgsMsDX3++YTlQYFYvvG6svA==
+        -----END PRIVATE KEY-----
+    conditions: []
+    identifiers:
+      pk: ba9f4ba9-2892-4fe4-a68e-e1ca8246a748
+    model: authentik_crypto.certificatekeypair
+    permissions: []
+    state: present
+  - attrs:
+      attributes:
+        goauthentik.io/user/token-expires: false
+      is_active: true
+      name: Impolar App
+      path: goauthentik.io/service-accounts
+      type: service_account
+      username: impolar-app
+      permissions:
+        - authentik_core.add_user
+        - authentik_core.view_user
+    conditions: []
+    identifiers:
+      pk: 10
+    model: authentik_core.user
+    state: present
+  - attrs:
+      identifier: service-account-impolar-app-password
+      intent: app_password
+      user: 10
+      key: changemechangeme
+      expiring: false
+    conditions: []
+    identifiers:
+      pk: fa224869-eab5-4503-b5ec-5b99c21ac53b
+    model: authentik_core.token
+    permissions: []
+    state: present
+  - attrs:
+      name: Impolar Customer
+    conditions: []
+    identifiers:
+      pk: bc59117c-34cf-4397-bbef-36698ef7924b
+    model: authentik_rbac.role
+    permissions: []
+    state: present
+  - attrs:
+      attributes: {}
+      name: Impolar Customers
+      roles:
+        - bc59117c-34cf-4397-bbef-36698ef7924b
+    conditions: []
+    identifiers:
+      pk: ba9868fc-b7da-43e0-887d-f40c8df1572c
+    model: authentik_core.group
+    permissions:
+      - user: 10
+        permission: add_user_to_group
+      - user: 10
+        permission: view_group
+    state: present
+  - attrs:
+      attributes:
+        company_id: 00000000-0000-0000-0000-000000000001
+      email: arena@kebab.com
+      groups:
+        - ba9868fc-b7da-43e0-887d-f40c8df1572c
+      is_active: true
+      last_login: "2025-11-27T16:40:33.866680Z"
+      path: customers
+      type: external
+      username: arena@kebab.com
+      name: Arena
+      password: arena
+    conditions: []
+    identifiers:
+      pk: 7
+    model: authentik_core.user
+    permissions: []
+    state: present
+  - attrs:
+      expression: 'return {"company_id": request.user.attributes.get("company_id")}'
+      name: Company ID
+      scope_name: company-id
+    conditions: []
+    identifiers:
+      pk: eedc502b-1021-4e62-b006-1b0c3d5ba7c5
+    model: authentik_providers_oauth2.scopemapping
+    permissions: []
+    state: present
+  - attrs:
+      expression: 'return { "groups": [group.name for group in request.user.ak_groups.all()] }'
+      name: Groups
+      scope_name: groups
+    conditions: []
+    identifiers:
+      pk: f8433e62-d316-45ad-a1fd-e79b397205d3
+    model: authentik_providers_oauth2.scopemapping
+    permissions: []
+    state: present
+  - attrs:
+      authentication: require_authenticated
+      denied_action: message_continue
+      designation: authorization
+      layout: stacked
+      name: Impolar Authorization
+      policy_engine_mode: any
+      title: Redirecting
+    conditions: []
+    identifiers:
+      pk: 542068c4-76bd-4b78-9b4a-bd5f2dfc2da8
+      slug: impolar-customer-authorization
+    model: authentik_flows.flow
+    permissions: []
+    state: present
+  - attrs:
+      authentication: none
+      denied_action: message_continue
+      designation: invalidation
+      layout: stacked
+      name: Logout
+      policy_engine_mode: any
+      title: Impolar Customer Invalidation
+    conditions: []
+    identifiers:
+      pk: b857d17c-10a2-4a9c-bc50-8300636562e6
+      slug: impolar-customer-invalidation-flow
+    model: authentik_flows.flow
+    permissions: []
+    state: present
+  - attrs: {}
+    conditions: []
+    identifiers:
+      name: impolar-customer-invalidation-logout
+      pk: f7fe6b11-f55b-4d7a-9096-3a2296419c1e
+    model: authentik_stages_user_logout.userlogoutstage
+    permissions: []
+    state: present
+  - attrs:
+      allow_show_password: true
+      backends:
+        - authentik.core.auth.InbuiltBackend
+        - authentik.core.auth.TokenBackend
+        - authentik.sources.ldap.auth.LDAPBackend
+        - authentik.sources.kerberos.auth.KerberosBackend
+      # configure_flow: 998a044c-1057-42bb-898f-3878551fafea
+      failed_attempts_before_cancel: 5
+      name: impolar-customer-authentication-password
+    conditions: []
+    identifiers:
+      pk: 295ecacc-03da-4132-b987-46cc65f64bef
+    model: authentik_stages_password.passwordstage
+    permissions: []
+    state: present
+  - attrs:
+      case_insensitive_matching: true
+      enable_remember_me: true
+      name: impolar-customer-authentication-identification
+      password_stage: 295ecacc-03da-4132-b987-46cc65f64bef
+      pretend_user_exists: true
+      show_matched_user: true
+      user_fields:
+        - email
+    conditions: []
+    identifiers:
+      pk: 7a8da9aa-886e-4b45-90db-82bd84f23198
+    model: authentik_stages_identification.identificationstage
+    permissions: []
+    state: present
+  - attrs:
+      geoip_binding: no_binding
+      name: impolar-customer-authentication-login
+      network_binding: no_binding
+      remember_device: days=30
+      remember_me_offset: seconds=0
+      session_duration: seconds=0
+    conditions: []
+    identifiers:
+      pk: b900559f-ba49-400b-92ce-5c48ef993f5b
+    model: authentik_stages_user_login.userloginstage
+    permissions: []
+    state: present
+  - attrs:
+      authentication: none
+      denied_action: message_continue
+      designation: authentication
+      layout: stacked
+      name: impolar-customer-authentication-flow
+      policy_engine_mode: any
+      slug: impolar-customer-authentication
+      title: Impolar Business Login
+    conditions: []
+    identifiers:
+      pk: 4dbd9c3d-1865-4c46-8de3-aef8f15ec952
+    model: authentik_flows.flow
+    permissions: []
+    state: present
+  - attrs:
+      invalid_response_action: retry
+      policy_engine_mode: any
+      re_evaluate_policies: true
+    conditions: []
+    identifiers:
+      order: 0
+      pk: e8c2f592-aae1-4d22-8431-84242ca3a49d
+      stage: f7fe6b11-f55b-4d7a-9096-3a2296419c1e
+      target: b857d17c-10a2-4a9c-bc50-8300636562e6
+    model: authentik_flows.flowstagebinding
+    permissions: []
+    state: present
+  - attrs:
+      invalid_response_action: retry
+      order: 10
+      policy_engine_mode: any
+      re_evaluate_policies: true
+      stage: 7a8da9aa-886e-4b45-90db-82bd84f23198
+      target: 4dbd9c3d-1865-4c46-8de3-aef8f15ec952
+    conditions: []
+    identifiers:
+      pk: 6f147c6b-905b-487b-9d2a-ce44ed75bea8
+    model: authentik_flows.flowstagebinding
+    permissions: []
+    state: present
+  - attrs:
+      invalid_response_action: retry
+      order: 100
+      policy_engine_mode: any
+      re_evaluate_policies: true
+      stage: b900559f-ba49-400b-92ce-5c48ef993f5b
+      target: 4dbd9c3d-1865-4c46-8de3-aef8f15ec952
+    conditions: []
+    identifiers:
+      pk: 9f09114e-1a3c-4151-88d8-cb9914fcc14a
+    model: authentik_flows.flowstagebinding
+    permissions: []
+    state: present
+  - attrs:
+      access_code_validity: minutes=1
+      access_token_validity: minutes=5
+      authorization_flow: 542068c4-76bd-4b78-9b4a-bd5f2dfc2da8
+      client_id: impolar-app
+      client_type: public
+      include_claims_in_id_token: true
+      invalidation_flow: b857d17c-10a2-4a9c-bc50-8300636562e6
+      issuer_mode: per_provider
+      logout_method: backchannel
+      name: Provider for Impolar App
+      property_mappings:
+        - eedc502b-1021-4e62-b006-1b0c3d5ba7c5
+        - f8433e62-d316-45ad-a1fd-e79b397205d3
+      refresh_token_threshold: hours=1
+      refresh_token_validity: days=30
+      signing_key: ba9f4ba9-2892-4fe4-a68e-e1ca8246a748
+      sub_mode: hashed_user_id
+      redirect_uris:
+        - matching_mode: regex
+          url: .*
+    conditions: []
+    identifiers:
+      pk: 25
+    model: authentik_providers_oauth2.oauth2provider
+    permissions: []
+    state: present
+  - attrs:
+      name: Impolar App
+      policy_engine_mode: any
+      provider: 25
+      slug: impolar-app
+    conditions: []
+    identifiers:
+      pk: 99c37e08-0a2e-467a-8ac9-18e3ed393e1a
+    model: authentik_core.application
+    permissions: []
+    state: present
+  - attrs:
+      authentication: none
+      denied_action: message
+      designation: enrollment
+      layout: stacked
+      name: Impolar User Enrollment
+      policy_engine_mode: any
+      slug: impolar-user-enrollment
+      title: Impolar User Enrollment
+    conditions: []
+    identifiers:
+      pk: a2976cc3-67eb-410f-83d1-94b39c4140f9
+    model: authentik_flows.flow
+    permissions: []
+    state: present
+  - attrs:
+      authentication: require_unauthenticated
+      denied_action: message_continue
+      designation: recovery
+      layout: stacked
+      name: Impolar Customer Password Recovery
+      policy_engine_mode: any
+      slug: impolar-customer-recovery-flow
+      title: Reset your password
+    conditions: []
+    identifiers:
+      pk: 7c7abeba-2375-4605-822b-1f93f63a50a1
+    model: authentik_flows.flow
+    permissions: []
+    state: present
+  - attrs:
+      activate_user_on_success: true
+      from_address: system@authentik.local
+      host: localhost
+      name: impolar-customer-recovery-email
+      port: 25
+      recovery_cache_timeout: minutes=5
+      recovery_max_attempts: 5
+      subject: Impolar
+      template: email/password_reset.html
+      timeout: 10
+      token_expiry: minutes=30
+      use_global_settings: true
+    conditions: []
+    identifiers:
+      pk: 3d170b09-0446-4fb0-a235-22dcb1570543
+    model: authentik_stages_email.emailstage
+    permissions: []
+    state: present
+  - attrs:
+      case_insensitive_matching: true
+      name: impolar-customer-recovery-identification
+      pretend_user_exists: true
+      show_matched_user: true
+      user_fields:
+        - email
+    conditions: []
+    identifiers:
+      pk: fac90e4e-7d34-4c87-a09f-cea61e5dfc55
+    model: authentik_stages_identification.identificationstage
+    permissions: []
+    state: present
+  - attrs:
+      geoip_binding: no_binding
+      name: impolar-customer-recovery-user-login
+      network_binding: no_binding
+      remember_device: days=30
+      remember_me_offset: seconds=0
+      session_duration: seconds=0
+    conditions: []
+    identifiers:
+      pk: bdd43cf1-ed46-404f-a804-f0a4efeb2ad7
+    model: authentik_stages_user_login.userloginstage
+    permissions: []
+    state: present
+  - attrs:
+      enabled: true
+      group: ba9868fc-b7da-43e0-887d-f40c8df1572c
+      order: 0
+      target: 99c37e08-0a2e-467a-8ac9-18e3ed393e1a
+      timeout: 30
+    conditions: []
+    identifiers:
+      pk: 20da2191-bb94-4c70-8cb7-85bc7c8a0785
+    model: authentik_policies.policybinding
+    permissions: []
+    state: present
+  - attrs:
+      name: impolar-customer-recovery-user-write
+      user_creation_mode: never_create
+      user_type: external
+    conditions: []
+    identifiers:
+      pk: 41398be7-dd61-4f95-96e6-f3ccb50493bb
+    model: authentik_stages_user_write.userwritestage
+    permissions: []
+    state: present
+  - attrs:
+      attributes: {}
+      branding_custom_css: "/* plus-jakarta-sans-latin-wght-normal */\n@font-face {\n  font-family: 'Plus Jakarta Sans Variable';\n  font-style: normal;\n  font-display: swap;\n  font-weight: 200 800;\n  src: url(https://cdn.jsdelivr.net/fontsource/fonts/plus-jakarta-sans:vf@latest/latin-wght-normal.woff2) format('woff2-variations');\n}\n\nbody {\n  --pf-global--FontFamily--sans-serif: 'Plus Jakarta Sans Variable', sans-serif;\n}\n\n.pf-c-title {\n  --pf-c-title--FontFamily: 'Plus Jakarta Sans Variable', sans-serif;\n}\n\n.pf-c-login__footer {\n  display: none !important;\n}\n\n.ak-login-container {\n  justify-content: center;\n}\n\n.pf-c-login__main {\n  border-radius: 20px;\n  flex: none;\n  margin-top: 0 !important;\n}\n\n.pf-c-login__main-footer-band {\n  background-color: transparent;\n}"
+      branding_default_flow_background: /static/dist/assets/impolar/background.jpg
+      branding_favicon: /static/dist/assets/impolar/logo-square.svg
+      branding_logo: /static/dist/assets/impolar/logo-plain.svg
+      branding_title: Impolar
+      default_application: 99c37e08-0a2e-467a-8ac9-18e3ed393e1a
+      domain: localhost:9061
+      flow_authentication: 4dbd9c3d-1865-4c46-8de3-aef8f15ec952
+      flow_invalidation: b857d17c-10a2-4a9c-bc50-8300636562e6
+    conditions: []
+    identifiers:
+      pk: 94fc582c-c58e-4a98-90fe-4b049f459ef8
+    model: authentik_brands.brand
+    permissions: []
+    state: present
