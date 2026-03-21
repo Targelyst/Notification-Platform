@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationPlatform", "Not
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationPlatform.Tests", "NotificationPlatform.Tests\NotificationPlatform.Tests.csproj", "{82CC5FE8-1AFD-4B59-B94F-DBD1680E7934}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationPlatform.Scripts", "NotificationPlatform.Scripts\NotificationPlatform.Scripts.csproj", "{04F90739-F2B9-4950-8E8C-24CBD9664F0F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{82CC5FE8-1AFD-4B59-B94F-DBD1680E7934}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82CC5FE8-1AFD-4B59-B94F-DBD1680E7934}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82CC5FE8-1AFD-4B59-B94F-DBD1680E7934}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04F90739-F2B9-4950-8E8C-24CBD9664F0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04F90739-F2B9-4950-8E8C-24CBD9664F0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04F90739-F2B9-4950-8E8C-24CBD9664F0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04F90739-F2B9-4950-8E8C-24CBD9664F0F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

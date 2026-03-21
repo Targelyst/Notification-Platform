@@ -12,4 +12,11 @@ public class EmailConfiguration : KeyedEntity {
     [UseSorting]
     public List<EmailContactProperty> Properties { get; set; } = [];
 
+    [UseFiltering]
+    [UseSorting]
+    public List<EmailTransport> Transports { get; set; } = [];
+
+    [UseFiltering]
+    public List<EmailSegment> Segments { get; set; } = [];
+
 }

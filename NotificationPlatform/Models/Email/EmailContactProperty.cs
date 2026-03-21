@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace NotificationPlatform.Models.Email;
@@ -15,6 +16,7 @@ public abstract class EmailContactProperty : KeyedEntity {
 
     [GraphQLIgnore]
     public EmailContactPropertyType Type { get; set; }
+
     public required string Name { get; set; }
     public bool Show { get; set; } = true;
 

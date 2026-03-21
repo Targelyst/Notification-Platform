@@ -1,7 +1,7 @@
 services:
   # Main database
   db:
-    image: postgres:16
+    image: timescale/timescaledb:latest-pg16
     restart: always
     ports:
       - "9081:5432"

@@ -6,6 +6,7 @@ using NotificationPlatform.Configuration;
 using NotificationPlatform.Data;
 using NotificationPlatform.Models.Email;
 using NotificationPlatform.Services;
+using NotificationPlatform.Services.Tracking;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,16 @@ builder.Services.AddOptions<AuthConfiguration>()
   .ValidateDataAnnotations()
   .ValidateOnStart();
 
+builder.Services.AddOptions<SecurityConfiguration>()
+  .Bind(builder.Configuration.GetSection(SecurityConfiguration.Section))
+  .ValidateDataAnnotations()
+  .ValidateOnStart();
+
+builder.Services.AddOptions<TrackerConfiguration>()
+  .Bind(builder.Configuration.GetSection(TrackerConfiguration.Section))
+  .ValidateDataAnnotations()
+  .ValidateOnStart();
+
 builder.Services.AddDbContextFactory<NotificationPlatformContext>(opt => {
     var c = builder.Configuration.GetSection(DatabaseConfiguration.Section).Get<DatabaseConfiguration>()
       ?? throw new Exception($"Could not get configuration section {DatabaseConfiguration.Section}");
@@ -29,11 +40,36 @@ builder.Services.AddDbContextFactory<NotificationPlatformContext>(opt => {
             opt.MapEnum<EmailContactPropertyType>();
         }
     );
+
+    if (builder.Environment.IsDevelopment()) {
+        opt.EnableSensitiveDataLogging();
+    }
 });
 
 builder.Services
     .AddHttpContextAccessor()
-    .AddScoped<IAuthorizationHandler, HasTenantHandler>();
+    .AddScoped<IAuthorizationHandler, HasTenantHandler>()
+    .AddScoped<EmailContactPropertyService>()
+    .AddSingleton<ICryptographyService, CryptographyServiceAES>()
+    .AddSingleton<TrackerService>()
+    .AddCors(options => {
+        options.AddDefaultPolicy(policy => {
+            var origins = builder.Configuration
+                .GetSection(WebConfiguration.Section)
+                .Get<WebConfiguration>()?
+                .CorsOrigins
+                ?? throw new Exception(
+                    $"Could not get configuration section {WebConfiguration.Section}"
+                );
+
+            policy
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .WithOrigins(origins);
+            // TODO: Restrict headers?
+            // .WithHeaders(HeaderNames.Authorization, HeaderNames.ContentType);
+        });
+    });
 
 if (!builder.Environment.IsDevelopment()) {
     builder.Services
@@ -76,10 +112,6 @@ builder.Services
     .AddType<EmailContactNumberProperty>()
     .AddType<EmailContactDateProperty>()
     .AddType<EmailContactChoiceProperty>()
-    .AddType<EmailContactStringPropertyValue>()
-    .AddType<EmailContactNumberPropertyValue>()
-    .AddType<EmailContactDatePropertyValue>()
-    .AddType<EmailContactChoicePropertyValue>()
     .ModifyRequestOptions(
         opt => opt.IncludeExceptionDetails = builder.Environment.IsDevelopment()
     )
@@ -88,9 +120,21 @@ builder.Services
             opt.IncludeTotalCount = true;
             opt.MaxPageSize = 100;
         }
+    )
+    .ModifyCostOptions(
+        opt => {
+            opt.MaxFieldCost = 6000;
+        }
+    )
+    .ModifyOptions(
+        opt => {
+            opt.EnableOneOf = true;
+        }
     );
 
 var app = builder.Build();
+
+app.UseCors();
 
 if (app.Environment.IsDevelopment()) {
     app.UseSeeding();

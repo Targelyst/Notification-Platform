@@ -30,6 +30,9 @@ namespace NotificationPlatform.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uuid");
 
@@ -78,6 +81,9 @@ namespace NotificationPlatform.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("EmailConfigurationId")
                         .HasColumnType("uuid");
 
@@ -117,22 +123,163 @@ namespace NotificationPlatform.Migrations
                     b.Property<Guid>("PropertyId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Tenant")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<EmailContactPropertyType>("Type")
-                        .HasColumnType("email_contact_property_type");
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("ContactId", "PropertyId");
 
                     b.HasIndex("PropertyId");
 
                     b.ToTable("EmailContactPropertyValues");
+                });
 
-                    b.HasDiscriminator<EmailContactPropertyType>("Type");
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailSegment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
-                    b.UseTphMappingStrategy();
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EmailConfigurationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Expression")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Tenant")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmailConfigurationId");
+
+                    b.ToTable("EmailSegments");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailTransport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EmailConfigurationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Host")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("Password")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<int>("Port")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Tenant")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("User")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmailConfigurationId");
+
+                    b.ToTable("EmailTransports");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailTransportSenderAddress", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Tenant")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TransportId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TransportId", "Address")
+                        .IsUnique();
+
+                    b.ToTable("EmailTransportSenderAddresses");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.Tracking.ProxiedEvent", b =>
+                {
+                    b.Property<Guid>("ContactId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Tenant")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("Value")
+                        .HasColumnType("bigint");
+
+                    b.HasIndex("ContactId");
+
+                    b.ToTable("ProxiedEvents");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.Tracking.TrackedEvent", b =>
+                {
+                    b.Property<Guid>("ContactId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Tenant")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("Value")
+                        .HasColumnType("bigint");
+
+                    b.HasIndex("ContactId");
+
+                    b.ToTable("TrackedEvents");
                 });
 
             modelBuilder.Entity("NotificationPlatform.Models.Project", b =>
@@ -140,6 +287,9 @@ namespace NotificationPlatform.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -182,66 +332,6 @@ namespace NotificationPlatform.Migrations
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactStringProperty", b =>
                 {
                     b.HasBaseType("NotificationPlatform.Models.Email.EmailContactProperty");
-
-                    b.HasDiscriminator().HasValue(EmailContactPropertyType.String);
-                });
-
-            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactChoicePropertyValue", b =>
-                {
-                    b.HasBaseType("NotificationPlatform.Models.Email.EmailContactPropertyValue");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.ToTable("EmailContactPropertyValues", t =>
-                        {
-                            t.Property("Value")
-                                .HasColumnName("EmailContactChoicePropertyValue_Value");
-                        });
-
-                    b.HasDiscriminator().HasValue(EmailContactPropertyType.Choice);
-                });
-
-            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactDatePropertyValue", b =>
-                {
-                    b.HasBaseType("NotificationPlatform.Models.Email.EmailContactPropertyValue");
-
-                    b.Property<DateOnly>("Value")
-                        .HasColumnType("date");
-
-                    b.ToTable("EmailContactPropertyValues", t =>
-                        {
-                            t.Property("Value")
-                                .HasColumnName("EmailContactDatePropertyValue_Value");
-                        });
-
-                    b.HasDiscriminator().HasValue(EmailContactPropertyType.Date);
-                });
-
-            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactNumberPropertyValue", b =>
-                {
-                    b.HasBaseType("NotificationPlatform.Models.Email.EmailContactPropertyValue");
-
-                    b.Property<double>("Value")
-                        .HasColumnType("double precision");
-
-                    b.HasDiscriminator().HasValue(EmailContactPropertyType.Number);
-                });
-
-            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactStringPropertyValue", b =>
-                {
-                    b.HasBaseType("NotificationPlatform.Models.Email.EmailContactPropertyValue");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.ToTable("EmailContactPropertyValues", t =>
-                        {
-                            t.Property("Value")
-                                .HasColumnName("EmailContactStringPropertyValue_Value");
-                        });
 
                     b.HasDiscriminator().HasValue(EmailContactPropertyType.String);
                 });
@@ -298,11 +388,70 @@ namespace NotificationPlatform.Migrations
                     b.Navigation("Property");
                 });
 
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailSegment", b =>
+                {
+                    b.HasOne("NotificationPlatform.Models.Email.EmailConfiguration", "EmailConfiguration")
+                        .WithMany("Segments")
+                        .HasForeignKey("EmailConfigurationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EmailConfiguration");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailTransport", b =>
+                {
+                    b.HasOne("NotificationPlatform.Models.Email.EmailConfiguration", "EmailConfiguration")
+                        .WithMany("Transports")
+                        .HasForeignKey("EmailConfigurationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EmailConfiguration");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailTransportSenderAddress", b =>
+                {
+                    b.HasOne("NotificationPlatform.Models.Email.EmailTransport", "Transport")
+                        .WithMany("SenderAddresses")
+                        .HasForeignKey("TransportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Transport");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.Tracking.ProxiedEvent", b =>
+                {
+                    b.HasOne("NotificationPlatform.Models.Email.EmailContact", "Contact")
+                        .WithMany()
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contact");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.Tracking.TrackedEvent", b =>
+                {
+                    b.HasOne("NotificationPlatform.Models.Email.EmailContact", "Contact")
+                        .WithMany()
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contact");
+                });
+
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailConfiguration", b =>
                 {
                     b.Navigation("Contacts");
 
                     b.Navigation("Properties");
+
+                    b.Navigation("Segments");
+
+                    b.Navigation("Transports");
                 });
 
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContact", b =>
@@ -313,6 +462,11 @@ namespace NotificationPlatform.Migrations
             modelBuilder.Entity("NotificationPlatform.Models.Email.EmailContactProperty", b =>
                 {
                     b.Navigation("Values");
+                });
+
+            modelBuilder.Entity("NotificationPlatform.Models.Email.EmailTransport", b =>
+                {
+                    b.Navigation("SenderAddresses");
                 });
 
             modelBuilder.Entity("NotificationPlatform.Models.Project", b =>

@@ -5,6 +5,9 @@
 		"clientKind": "git",
 		"useIgnoreFile": false
 	},
+	"files": {
+		"ignore": ["./src/gql/*.ts"]
+	},
 	"formatter": {
 		"enabled": true
 	},
